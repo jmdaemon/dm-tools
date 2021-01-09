@@ -47,15 +47,39 @@ pages = queue.Queue()
 saved = queue.Queue()
 
 def getHTMLParallel():
-        html = getHTML(pages.get())
-        writeToFile(html, saved.get())
+    # html = getHTML(pages.get())
+    # writeToFile(html, saved.get())
+    currentPage = pages.get()
+    saveAs = saved.get()
+    print(f'currentPage : {currentPage}')
+    print(f'saveAs      : {saveAs}')
+
+def printDownload(currentPage, pageIndex, saveAs):
+    print(f'currentPage : {currentPage}')
+    print(f'pageIndex   : {pageIndex}')
+    print(f'saveAs      : {saveAs}')
+    # print(f'')
+
+def downloadHTML():
+    while (not pages.empty() and not saved.empty()):
+        if (threading.active_count() <= 4):
+            worker = threading.Thread(target=getHTMLParallel)
+            worker.start()
+        else:
+            for thread in threading.enumerate():
+                if (thread is threading.main_thread()): 
+                    continue
+                else: 
+                    thread.join()
 
 def getAllHTML(end, site, directory):
     index = 1
     pageIndex = 0
     while (pageIndex < end):
         currentPage = (f'{site}?s={pageIndex}') 
-        saveAs = (f'{directory}/mz4250-creations-page-{index}') 
+        # saveAs = (f'{directory}/mz4250-creations-page-{index}') 
+        saveAs = (f'./null/mz4250-creations-page-{index}') 
+        printDownload(currentPage, pageIndex, saveAs)
 
         if (not os.path.exists(saveAs)):
             pages.put(currentPage)
@@ -68,17 +92,7 @@ def getAllHTML(end, site, directory):
     saveAs = (f'{directory}/mz4250-creations-page-{index}')
     pages.put(currentPage)
     saved.put(saveAs)
-
-    while (not pages.empty() and not saved.empty()):
-        if (threading.active_count() <= 4):
-            worker = threading.Thread(target=getHTMLParallel)
-            worker.start()
-        else:
-            for thread in threading.enumerate():
-                if (thread is threading.main_thread()): 
-                    continue
-                else: 
-                    thread.join()
+    downloadHTML()
 
 def getEnd(tag):
     exp = "(?<=\/designer\/mz4250\/creations\?s=)(\d{1,4})(?=#more-products)"
