@@ -39,3 +39,13 @@ def test_writeToFileShouldCreateFile():
         f.close()
         os.remove(testFile)
 
+def test_getHTML_ReturnsHTML():
+    site = "https://www.shapeways.com/designer/mz4250/creations"
+    page = downloadAllMinis.getHTML(site)
+    assert(page is not None)
+
+def test_getEnd_ReturnsInteger(createSoup):
+    pages = downloadAllMinis.getPages(createSoup)
+    assert(pages is not None)
+    end = downloadAllMinis.getEnd(pages)
+    assert(end is not None)
