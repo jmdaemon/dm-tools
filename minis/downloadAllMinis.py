@@ -43,15 +43,7 @@ def getHTML(site):
     page = requests.get(site)
     return page.text
 
-# def runOnNewThread():
-    # thread_count += 1
-
-# pages = queue.Queue()
-# saved = queue.Queue()
-
 def getHTMLParallel(currentPage, saveAs):
-    # if (pages is not None and saved is not None):
-        # writeToFile(getHTML(pages.get()), saved.get())
     if (currentPage is not None and saveAs is not None):
         print(f"Got HTML page: {currentPage}")
         print(f"Wrote to file: {saveAs}")
@@ -71,22 +63,15 @@ def getAllHTML(end, site, directory):
         print(f'saveAs      : {saveAs}')
 
         if (not os.path.exists(saveAs)):
-            # thread_count = threading.active_count()
-            # if (thread_count < 5):
             if (threading.active_count() <= 5):
-                # print(f"Creating new worker: worker_count: {thread_count}")
                 worker = threading.Thread(target=getHTMLParallel, args=(currentPage, saveAs))
                 worker.start()
-            # elif (thread_count == 4 or thread_count > 4):
             else:
                 for thread in threading.enumerate():
                     if (thread is threading.main_thread()): 
                         continue
                     else: 
                         thread.join()
-            # else:
-            # html = getHTML(currentPage)
-            # writeToFile(html, saveAs)
         index += 1
     currentPage = (f'{site}?s={pageIndex}') 
     pageIndex = end 
@@ -107,10 +92,8 @@ def getEnd(tag):
 # path = "./html"
 site = "https://www.shapeways.com/designer/mz4250/creations"
 
-# x = threading.Thread(target=getHTMLParallel, args=(1,))
 # writeToFile(getHTMLPage(site), path + "/mz4250-creations-page-1")
 # getAllHTML(end)
-
 
 end = getEnd(getPages(createSoup("creations.html")))
 getAllHTML(end, site, "./html")
