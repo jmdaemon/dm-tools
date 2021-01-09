@@ -112,72 +112,13 @@ def getLinks(site, soup):
     return links
 
 def getNames(site, soup):
-    exp = r"(\w+.)+\n(?=The DM Workshop)"
-    regexp = re.compile(exp)
-    # resultsSet = soup.find_all('a')
-    # results = soup.find_all('a', text=True)
-    # results = soup.find_all('a', 'product-url', text=re.compile("(\w+.)+"))
     results = soup.find_all('a', 'product-url', text=True)
     names = []
     for result in results:
-        # print(result.get_text())
         names.append(result.get_text())
 
     print(names)
     return names
-
-
-    # results = []
-    # for result in resultsSet:
-        # results.append(result.text)
-    # print(results)
-    # results = resultsSet.text
-    
-    # names = list(filter(regexp.match, results))
-    # print(names)
-    # print(results)
-    # for name in names:
-        # print(name.text)
-    # print(type(names))
-    # names = []
-    # for result in resultSet:
-        # names.append(result.string)
-
-    # results = []
-    # for name in names:
-        # result.append(re.find
-        # for name in names:
-            # # results = re.findall(exp, names)
-            # results = re.find(exp, name)
-
-    # print(names)
-    # print(resultSet)
-
-    # results = re.findall(exp, names)
-    # results = filter(regexp.match, resultSet)
-    # print(list(results))
-    # # print(results)
-    # # for result in results:
-        # # print(result)
-    # print(results)
-    # return results
-    # it = re.finditer(exp, str(resultSet[0]))
-    # for match in it:
-        # print(match.group(0))
-    # for reuslt in resultSet:
-        # print(result)
-
-    # results = regexp.findall(resultSet)
-
-    # results = re.findall(exp, names)
-    # for result in results:
-        # print(result)
-    # print(results)
-    # for name in names:
-        # print(name.content)
-    # print(names.text)
-    # return names
-
 
 # path = "./html"
 site = "https://www.shapeways.com/designer/mz4250/creations"
