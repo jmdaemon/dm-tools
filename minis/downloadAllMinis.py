@@ -100,6 +100,8 @@ def getEnd(tag):
     index = regexp.search(tag[5]['href'])
     return int(index.group(0))
 
+ids = queue.Queue()
+names = queue.Queue()
 
 def getLinks(site, soup):
     exp = r"\"?(https:\/\/www\.shapeways.com\/product\/\w{9}\/)(\w*\-*)*(\?optionId=\d{1,16})(.*user-profile)\"?"
@@ -113,12 +115,24 @@ def getLinks(site, soup):
 
 def getNames(site, soup):
     results = soup.find_all('a', 'product-url', text=True)
-    names = []
     for result in results:
-        names.append(result.get_text())
+        names.put(result.get_text())
 
-    print(names)
-    return names
+def getIds(links, soup): 
+    exp = r"(\"?)(?<=https:\/\/www\.shapeways\.com\/product\/)(\w+)"
+    regex = re.compile(exp)
+
+    for link in links:
+        # print(link)
+        match = regex.search(link)
+        print(match.group(0))
+
+def downloadMiniature(soup):
+    link = links.get()
+    name = names.get()
+    print(f'link: {link}')
+    print(f'name: {name}')
+
 
 # path = "./html"
 site = "https://www.shapeways.com/designer/mz4250/creations"
@@ -128,6 +142,11 @@ site = "https://www.shapeways.com/designer/mz4250/creations"
 
 # end = getEnd(getPages(createSoup("creations.html")))
 # getAllHTML(end, site, "./html")
+soup = createSoup("creations.html")
 
-# getLinks(site, createSoup("creations.html"))
-getNames(site, createSoup("creations.html"))
+links = getLinks(site, soup)
+getNames(site, soup)
+getIds(links, soup)
+# downloadMiniature(soup)
+# print(links)
+# print(names)
