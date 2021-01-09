@@ -15,6 +15,8 @@ import threading, queue
 # 6. Create master index hash table.
 # 7. Look up each url, get the file, download and save as filename
 
+pages = queue.Queue()
+saved = queue.Queue()
 
 def createSoup(filename):
     f = open(filename, "r") 
@@ -43,22 +45,18 @@ def getHTML(site):
     page = requests.get(site)
     return page.text
 
-pages = queue.Queue()
-saved = queue.Queue()
-
 def getHTMLParallel():
-    # html = getHTML(pages.get())
-    # writeToFile(html, saved.get())
-    currentPage = pages.get()
-    saveAs = saved.get()
-    print(f'currentPage : {currentPage}')
-    print(f'saveAs      : {saveAs}')
+    html = getHTML(pages.get())
+    writeToFile(html, saved.get())
+    # currentPage = pages.get()
+    # saveAs = saved.get()
+    # print(f'currentPage : {currentPage}')
+    # print(f'saveAs      : {saveAs}')
 
 def printDownload(currentPage, pageIndex, saveAs):
     print(f'currentPage : {currentPage}')
     print(f'pageIndex   : {pageIndex}')
     print(f'saveAs      : {saveAs}')
-    # print(f'')
 
 def downloadHTML():
     while (not pages.empty() and not saved.empty()):
@@ -74,8 +72,7 @@ def downloadHTML():
 
 def getHTMLPage(pageIndex, index):
     currentPage = (f'{site}?s={pageIndex}') 
-    # saveAs = (f'{directory}/mz4250-creations-page-{index}') 
-    saveAs = (f'./null/mz4250-creations-page-{index}') 
+    saveAs = (f'{directory}/mz4250-creations-page-{index}') 
     return currentPage, saveAs
 
 def pushBackPage(currentPage, saveAs):
@@ -87,7 +84,6 @@ def getAllHTML(end, site, directory):
     pageIndex = 0
     while (pageIndex < end):
         currentPage, saveAs = getHTMLPage(pageIndex, index)
-        printDownload(currentPage, pageIndex, saveAs)
         if (not os.path.exists(saveAs)):
             pushBackPage(currentPage, saveAs)
         pageIndex += 48
@@ -95,7 +91,6 @@ def getAllHTML(end, site, directory):
 
     pageIndex = end 
     currentPage, saveAs = getHTMLPage(pageIndex, index)
-    printDownload(currentPage, pageIndex, saveAs)
     pushBackPage(currentPage, saveAs)
     downloadHTML()
 
@@ -106,11 +101,23 @@ def getEnd(tag):
     return int(index.group(0))
 
 
+def getLinks(site, soup):
+    exp = r"\"?(https:\/\/www\.shapeways.com\/product\/\w{9}\/)(\w*\-*)*(\?optionId=\d{1,16})(.*user-profile)\"?"
+    URLS = soup.find_all('a', href = re.compile(exp))
+
+    links = []
+    for url in URLS:
+        link = url['href']
+        links.append(link)
+    return links
+
 # path = "./html"
 site = "https://www.shapeways.com/designer/mz4250/creations"
 
 # writeToFile(getHTMLPage(site), path + "/mz4250-creations-page-1")
 # getAllHTML(end)
 
-end = getEnd(getPages(createSoup("creations.html")))
-getAllHTML(end, site, "./html")
+# end = getEnd(getPages(createSoup("creations.html")))
+# getAllHTML(end, site, "./html")
+
+getMinisURL(site, createSoup("creations.html"))
