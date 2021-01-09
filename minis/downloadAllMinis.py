@@ -106,11 +106,14 @@ names = queue.Queue()
 def getLinks(site, soup):
     exp = r"\"?(https:\/\/www\.shapeways.com\/product\/\w{9}\/)(\w*\-*)*(\?optionId=\d{1,16})(.*user-profile)\"?"
     URLS = soup.find_all('a', href = re.compile(exp))
+    # print (URLS)
 
-    links = []
+    # links = []
+    links = set()
     for url in URLS:
         link = url['href']
-        links.append(link)
+        # links.append(link)
+        links.add(link)
     return links
 
 def getNames(site, soup):
