@@ -43,41 +43,78 @@ def getHTML(site):
     page = requests.get(site)
     return page.text
 
-def getHTMLParallel(currentPage, saveAs):
-    if (currentPage is not None and saveAs is not None):
+pages = queue.Queue()
+saved = queue.Queue()
+
+# def getHTMLParallel(currentPage, saveAs):
+def getHTMLParallel():
+    # if (currentPage is not None and saveAs is not None):
+        currentPage = pages.get()
+        saveAs = saved.get()
         print(f"Got HTML page: {currentPage}")
         print(f"Wrote to file: {saveAs}")
-        # html = getHTML(currentPage)
-        # writeToFile(html, saveAs)
+        print(f'')
+        html = getHTML(currentPage)
+        writeToFile(html, saveAs)
+
+def printDownload(currentPage, pageIndex, saveAs):
+    print(f'currentPage : {currentPage}')
+    print(f'pageIndex   : {pageIndex}')
+    print(f'saveAs      : {saveAs}')
+    print(f'')
 
 def getAllHTML(end, site, directory):
     index = 1
     pageIndex = 0
+    print(f'=============== Starting Download ===============')
     while (pageIndex < end):
         currentPage = (f'{site}?s={pageIndex}') 
-        pageIndex += 48
-        saveAs = (f'{directory}/mz4250-creations-page-{index}')
-
-        print(f'currentPage : {currentPage}')
-        print(f'pageIndex   : {pageIndex}')
-        print(f'saveAs      : {saveAs}')
+        saveAs = (f'{directory}/mz4250-creations-page-{index}') 
+        printDownload(currentPage, pageIndex, saveAs)
 
         if (not os.path.exists(saveAs)):
-            if (threading.active_count() <= 5):
-                worker = threading.Thread(target=getHTMLParallel, args=(currentPage, saveAs))
-                worker.start()
-            else:
-                for thread in threading.enumerate():
-                    if (thread is threading.main_thread()): 
-                        continue
-                    else: 
-                        thread.join()
+            pages.put(currentPage)
+            saved.put(saveAs)
+            # if (threading.active_count() <= 4):
+                # worker = threading.Thread(target=getHTMLParallel, args=(currentPage, saveAs))
+                # worker.start()
+            # else:
+                # for thread in threading.enumerate():
+                    # if (thread is threading.main_thread()): 
+                        # continue
+                    # else: 
+                        # thread.join()
+        pageIndex += 48
         index += 1
-    currentPage = (f'{site}?s={pageIndex}') 
-    pageIndex = end 
-    saveAs = (f'{directory}/mz4250-creations-page-{index}')
 
-    getHTMLParallel(currentPage, saveAs)
+    pageIndex = end 
+    # index += 1
+    currentPage = (f'{site}?s={pageIndex}') 
+    saveAs = (f'{directory}/mz4250-creations-page-{index}')
+    pages.put(currentPage)
+    saved.put(saveAs)
+
+    printDownload(currentPage, pageIndex, saveAs)
+    print(f'=============== Download Finished ===============')
+
+    # getHTMLParallel(currentPage, saveAs)
+    while (not pages.empty() and not saved.empty()):
+        if (threading.active_count() <= 4):
+            # worker = threading.Thread(target=getHTMLParallel, args=(currentPage, saveAs))
+            worker = threading.Thread(target=getHTMLParallel)
+            worker.start()
+        else:
+            for thread in threading.enumerate():
+                if (thread is threading.main_thread()): 
+                    continue
+                else: 
+                    thread.join()
+
+    # currentPage = (f'{site}?s={pageIndex}') 
+    # pageIndex = end 
+    # saveAs = (f'{directory}/mz4250-creations-page-{index}')
+
+    # getHTMLParallel(currentPage, saveAs)
     # html = getHTML(currentPage)
     # writeToFile(html, saveAs)
 
