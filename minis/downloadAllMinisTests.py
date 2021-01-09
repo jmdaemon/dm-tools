@@ -33,11 +33,7 @@ def test_writeToFileShouldCreateFile():
     try:
         f = open(testFile, "r")
         contents = f.read()
-        # print(f.read(0))
-        print(contents)
-        # assert(f.read() is not None or f.read() is not '')
         assert(contents is not None or f.read() is not '')
-        # assert(f.read(0) == "Writing to file")
         assert(contents == "Writing to file")
     finally:
         f.close()
