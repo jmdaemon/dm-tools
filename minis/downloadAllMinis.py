@@ -17,19 +17,16 @@ import cProfile
 # f = open("creations", "r");
 # soup = BeautifulSoup(f, 'html.parser')
 
-path = "./html"
+# path = "./html"
 
 site = "https://www.shapeways.com/designer/mz4250/creations"
 
 def getPages(soup):
     regexp = "(\/designer\/mz4250\/creations\?s=\d{0,4}#more-products)"
     pages = soup.find_all('a', href = re.compile(regexp))
-    # result = None
-    # if (regexp.match(pages))
     return pages
-    # print(pages)
 
-def makeHTMLDir():
+def makeHTMLDir(path):
     try:
         os.mkdir(path)
     except OSError:
@@ -38,7 +35,7 @@ def makeHTMLDir():
         print ("Successfully created the directory %s " % path)
 
 def writeToFile(html, fileName):
-    f = open(fileName, "a")
+    f = open(fileName, "w")
     f.write(html)
     f.close()
 
@@ -49,13 +46,13 @@ def getHTML(site):
 # def runOnNewThread():
     # thread_count += 1
 
-def getAllHTML(end):
+def getAllHTML(end, site):
     index = 1
     pageIndex = 48
     while (pageIndex < end):
         currentPage = (f'{site}?s={pageIndex}')
         pageIndex += 48
-        saveAs = (f'{path}/mz4250-creations-page-{index}')
+        saveAs = (f'{site}/mz4250-creations-page-{index}')
 
         print(f'currentPage: {currentPage}')
         print(f'pageIndex: {pageIndex}')

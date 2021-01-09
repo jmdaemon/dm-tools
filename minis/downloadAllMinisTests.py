@@ -9,25 +9,37 @@ import downloadAllMinis
 
 import pytest
 
+
 @pytest.fixture
 def createSoup():
     f = open("creations.html", "r")
     soup = BeautifulSoup(f, 'html.parser')
     return soup
 
-path = "testpath"
-def getPagesShouldReturnsSoup(createSoup):
-    pages = getPages(createSoup)
+def test_getPages_ShouldReturnsSoup(createSoup):
+    pages = downloadAllMinis.getPages(createSoup)
     assert(pages is not None)
 
-def makeHTMLDirShouldCreateDir():
-    makeHTMLDir()
+def test_makeHTMLDir_ShouldCreateDir():
+    path = "testpath"
+    downloadAllMinis.makeHTMLDir(path)
     assert(os.path.exists(path))
     os.rmdir(path)
 
-def writeToFileShouldCreateFile():
-    writeToFile("Writing to file", "testFile.txt")
-    # Assert file exists
-    # Assert file has contents
-    # Clean
+def test_writeToFileShouldCreateFile(): 
+    testFile = "testFile.txt"
+    downloadAllMinis.writeToFile("Writing to file", testFile)
+    assert(os.path.exists(testFile))
+    try:
+        f = open(testFile, "r")
+        contents = f.read()
+        # print(f.read(0))
+        print(contents)
+        # assert(f.read() is not None or f.read() is not '')
+        assert(contents is not None or f.read() is not '')
+        # assert(f.read(0) == "Writing to file")
+        assert(contents == "Writing to file")
+    finally:
+        f.close()
+        os.remove(testFile)
 
