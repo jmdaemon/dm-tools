@@ -72,13 +72,21 @@ def downloadHTML():
                 else: 
                     thread.join()
 
+def getHTMLPage(pageIndex, index):
+    currentPage = (f'{site}?s={pageIndex}') 
+    # saveAs = (f'{directory}/mz4250-creations-page-{index}') 
+    saveAs = (f'./null/mz4250-creations-page-{index}') 
+    return currentPage, saveAs
+
 def getAllHTML(end, site, directory):
     index = 1
     pageIndex = 0
     while (pageIndex < end):
-        currentPage = (f'{site}?s={pageIndex}') 
-        # saveAs = (f'{directory}/mz4250-creations-page-{index}') 
-        saveAs = (f'./null/mz4250-creations-page-{index}') 
+        # currentPage = (f'{site}?s={pageIndex}') 
+        # # saveAs = (f'{directory}/mz4250-creations-page-{index}') 
+        # saveAs = (f'./null/mz4250-creations-page-{index}') 
+        currentPage, saveAs = getHTMLPage(pageIndex, index)
+
         printDownload(currentPage, pageIndex, saveAs)
 
         if (not os.path.exists(saveAs)):
@@ -88,8 +96,9 @@ def getAllHTML(end, site, directory):
         index += 1
 
     pageIndex = end 
-    currentPage = (f'{site}?s={pageIndex}') 
-    saveAs = (f'{directory}/mz4250-creations-page-{index}')
+    # currentPage = (f'{site}?s={pageIndex}') 
+    # saveAs = (f'{directory}/mz4250-creations-page-{index}')
+    currentPage, saveAs = getHTMLPage(pageIndex, index)
     pages.put(currentPage)
     saved.put(saveAs)
     downloadHTML()
