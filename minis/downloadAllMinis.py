@@ -14,8 +14,8 @@ import cProfile
 # 6. Create master index hash table.
 # 7. Look up each url, get the file, download and save as filename
 
-f = open("creations", "r");
-soup = BeautifulSoup(f, 'html.parser')
+# f = open("creations", "r");
+# soup = BeautifulSoup(f, 'html.parser')
 
 path = "./html"
 
