@@ -133,19 +133,6 @@ def getIds(links, soup):
         match = regex.search(link)
         ids.put(match.group(0))
 
-def is_downloadable(url):
-    """
-    Does the url contain a downloadable resource
-    """
-    h = requests.head(url, allow_redirects=True)
-    header = h.headers
-    content_type = header.get('content-type')
-    if 'text' in content_type.lower():
-        return False
-    if 'html' in content_type.lower():
-        return False
-    return True
-
 def createCookies(session, req = {}, opt = {}): 
     required = { 
         'name': req[1], 
