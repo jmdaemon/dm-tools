@@ -4,6 +4,11 @@ import os
 import requests
 import cProfile
 import threading, queue
+import json
+
+
+
+from requests.auth import HTTPBasicAuth
 
 # downloadAllMinis.py - Downloads .stl files of miniatures
 
@@ -100,20 +105,19 @@ def getEnd(tag):
     index = regexp.search(tag[5]['href'])
     return int(index.group(0))
 
+minis_links = queue.Queue()
 ids = queue.Queue()
 names = queue.Queue()
 
 def getLinks(site, soup):
     exp = r"\"?(https:\/\/www\.shapeways.com\/product\/\w{9}\/)(\w*\-*)*(\?optionId=\d{1,16})(.*user-profile)\"?"
     URLS = soup.find_all('a', href = re.compile(exp))
-    # print (URLS)
 
-    # links = []
     links = set()
     for url in URLS:
         link = url['href']
-        # links.append(link)
         links.add(link)
+        minis_links.put(link)
     return links
 
 def getNames(site, soup):
@@ -126,15 +130,116 @@ def getIds(links, soup):
     regex = re.compile(exp)
 
     for link in links:
-        # print(link)
         match = regex.search(link)
-        print(match.group(0))
+        ids.put(match.group(0))
+
+def is_downloadable(url):
+    """
+    Does the url contain a downloadable resource
+    """
+    h = requests.head(url, allow_redirects=True)
+    header = h.headers
+    content_type = header.get('content-type')
+    if 'text' in content_type.lower():
+        return False
+    if 'html' in content_type.lower():
+        return False
+    return True
+
+def createCookies(session, req = {}, opt = {}): 
+    required = { 
+        'name': req[1], 
+        'value': req[2]
+    } 
+
+    optional = { 
+        'version': 0, 
+        'port': None, 
+        'domain': opt[1], 
+        'path':'/', 
+        'secure': opt[2], 
+        'expires': opt[3],
+        'discard': True,
+        'comment': None,
+        'comment_url': None,
+        'rest':{'HttpOnly': opt[4]},
+        'rfc2109': False
+    }
+
+    cookie = requests.cookies.create_cookie(**required, **optional)
+    session.cookies.set_cookie(cookie)
+    return cookie
 
 def downloadMiniature(soup):
-    link = links.get()
-    name = names.get()
-    print(f'link: {link}')
-    print(f'name: {name}')
+    # link = links.get()
+
+    # while (not ids.empty() and not names.empty())
+    mini_id    = ids.get()
+    name       = names.get()
+    downloadLink = (f'https://www.shapeways.com/product/download/{mini_id}')
+
+    print(mini_id)
+    print(downloadLink)
+
+    # __cfduid = dict({ '1': "__cfduid", '2': "dd4e4ad5a12f3eeb9a89139f43b137d211608008733" })
+    # __cfduid_opt = dict({ '1', '.shapeways.com', '2', false, '3', '', '4', 'true' })
+
+    # PHPSESSID = dict({
+        # '1': 
+    # })
+
+    # shapeways_guest = dict({
+    # })
+    session = requests.Session()
+    # createCookies(session, {''}, {});
+
+    # my_cookie = {
+    # 'Content-type': 'application/zip', 
+    # "name":'sw_usr',
+    # "value":'187af943d900b0a1753cb31f192f4f1f06854c9c',
+    # "domain":'.shapeways.com',
+    # "path":'/',
+    # }
+
+    # requests.utils.add_dict_to_cookiejar(session.cookies, my_cookie)
+
+    headers = { 
+        'Content-type': 'application/zip',
+        'Host': 'www.shapeways.com',
+        'User-Agent': "Mozilla/5.0 (X11; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0",
+        'Accept': "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        'Referer': minis_links.get(),
+        'Cookie': '__cfduid=dd4e4ad5a12f3eeb9a89139f43b137d211608008733; shapeways_guest=2ad9b47812f7643badebb042252d45aefa12e9eb; whid=9; PHPSESSID=u1bh765cf6oosb7dcco7433gdc; sw_usr=187af943d900b0a1753cb31f192f4f1f06854c9c; uauth=2343099'
+    }
+
+    # session.headers.update(headers) 
+    with open('creds.json') as f: 
+        data = json.load(f)
+
+    print(data['username'] + " " + data['password'])
+
+    # mini = session.get(downloadLink, allow_redirects=True, headers=headers, auth=(data['username'], data['password']))
+    # if (mini.status_code != 404):
+        # print(mini.text)
+        # with open('test.zip', 'wb') as f:
+            # f.write(mini.content)
+
+    # print (mini.headers)
+    # print (mini.request.headers)
+
+
+
+    # print(mini.request.headers)
+    # print(requests.is_downloadable(downloadLink))
+    # print(is_downloadable(downloadLink))
+    # mini = requests.get(downloadLink, allow_redirects=True)
+    # print(mini)
+    # print(mini.content)
+    # print(mini.text)
+
+
+    # print(f'link: {link}')
+    # print(f'name: {name}')
 
 
 # path = "./html"
@@ -145,11 +250,12 @@ site = "https://www.shapeways.com/designer/mz4250/creations"
 
 # end = getEnd(getPages(createSoup("creations.html")))
 # getAllHTML(end, site, "./html")
-soup = createSoup("creations.html")
+# soup = createSoup("creations.html")
+soup = createSoup("./html/mz4250-creations-page-1")
 
 links = getLinks(site, soup)
 getNames(site, soup)
 getIds(links, soup)
-# downloadMiniature(soup)
+downloadMiniature(soup)
 # print(links)
 # print(names)
