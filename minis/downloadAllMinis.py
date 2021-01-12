@@ -133,6 +133,17 @@ def getIds(links, soup):
         match = regex.search(link)
         ids.put(match.group(0))
 
+def createHeaders():
+    headers = { 
+        'Content-type': 'application/zip',
+        'Host': 'www.shapeways.com',
+        'User-Agent': "Mozilla/5.0 (X11; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0",
+        'Accept': "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        'Referer': minis_links.get(),
+        'Cookie': '__cfduid=dd4e4ad5a12f3eeb9a89139f43b137d211608008733; shapeways_guest=2ad9b47812f7643badebb042252d45aefa12e9eb; whid=9; PHPSESSID=u1bh765cf6oosb7dcco7433gdc; sw_usr=187af943d900b0a1753cb31f192f4f1f06854c9c; uauth=2343099'
+    }
+    return headers
+
 def downloadMiniature(soup):
     # link = links.get()
 
@@ -144,38 +155,9 @@ def downloadMiniature(soup):
     print(mini_id)
     print(downloadLink)
 
-    # __cfduid = dict({ '1': "__cfduid", '2': "dd4e4ad5a12f3eeb9a89139f43b137d211608008733" })
-    # __cfduid_opt = dict({ '1', '.shapeways.com', '2', false, '3', '', '4', 'true' })
-
-    # PHPSESSID = dict({
-        # '1': 
-    # })
-
-    # shapeways_guest = dict({
-    # })
     session = requests.Session()
-    # createCookies(session, {''}, {});
+    headers = createHeaders()
 
-    # my_cookie = {
-    # 'Content-type': 'application/zip', 
-    # "name":'sw_usr',
-    # "value":'187af943d900b0a1753cb31f192f4f1f06854c9c',
-    # "domain":'.shapeways.com',
-    # "path":'/',
-    # }
-
-    # requests.utils.add_dict_to_cookiejar(session.cookies, my_cookie)
-
-    headers = { 
-        'Content-type': 'application/zip',
-        'Host': 'www.shapeways.com',
-        'User-Agent': "Mozilla/5.0 (X11; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0",
-        'Accept': "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-        'Referer': minis_links.get(),
-        'Cookie': '__cfduid=dd4e4ad5a12f3eeb9a89139f43b137d211608008733; shapeways_guest=2ad9b47812f7643badebb042252d45aefa12e9eb; whid=9; PHPSESSID=u1bh765cf6oosb7dcco7433gdc; sw_usr=187af943d900b0a1753cb31f192f4f1f06854c9c; uauth=2343099'
-    }
-
-    # session.headers.update(headers) 
     with open('creds.json') as f: 
         data = json.load(f)
 
