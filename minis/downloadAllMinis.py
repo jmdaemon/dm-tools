@@ -133,30 +133,6 @@ def getIds(links, soup):
         match = regex.search(link)
         ids.put(match.group(0))
 
-def createCookies(session, req = {}, opt = {}): 
-    required = { 
-        'name': req[1], 
-        'value': req[2]
-    } 
-
-    optional = { 
-        'version': 0, 
-        'port': None, 
-        'domain': opt[1], 
-        'path':'/', 
-        'secure': opt[2], 
-        'expires': opt[3],
-        'discard': True,
-        'comment': None,
-        'comment_url': None,
-        'rest':{'HttpOnly': opt[4]},
-        'rfc2109': False
-    }
-
-    cookie = requests.cookies.create_cookie(**required, **optional)
-    session.cookies.set_cookie(cookie)
-    return cookie
-
 def downloadMiniature(soup):
     # link = links.get()
 
