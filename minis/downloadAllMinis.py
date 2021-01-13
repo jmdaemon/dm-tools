@@ -40,9 +40,8 @@ def makeHTMLDir(path):
         print ("Successfully created the directory %s " % path)
 
 def writeToFile(html, fileName):
-    f = open(fileName, "w")
-    f.write(html)
-    f.close()
+    with open(fileName, 'w') as f:
+        f.write(html)
 
 def getHTML(site): 
     page = requests.get(site)
