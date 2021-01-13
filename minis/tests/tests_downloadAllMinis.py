@@ -17,15 +17,16 @@ import pytest
 def createSoup():
     f = open("creations.html", "r")
     soup = BeautifulSoup(f, 'html.parser')
+    f.close()
     return soup
 
-def test_makeHTMLDir_ShouldCreateDir():
+def test_createDir_CreatesHTML():
     path = "testpath"
-    downloader.downloadAllMinis.makeHTMLDir(path)
+    downloader.downloadAllMinis.createDir(path)
     assert(os.path.exists(path))
     os.rmdir(path)
 
-def test_writeToFileShouldCreateFile(): 
+def test_writeToFile_OutputsFile(): 
     testFile = "testFile.txt"
     downloader.downloadAllMinis.writeToFile("Writing to file", testFile)
     assert(os.path.exists(testFile))

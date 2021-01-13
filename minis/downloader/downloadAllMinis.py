@@ -21,12 +21,12 @@ from requests.auth import HTTPBasicAuth
 pages = queue.Queue()
 saved = queue.Queue()
 
-def createSoup(filename):
-    f = open(filename, "r") 
-    soup = BeautifulSoup(f, 'html.parser')
-    return soup
+def createSoup(fileName):
+    with open(fileName, 'r') as f: 
+        soup = BeautifulSoup(f, 'html.parser')
+        return soup
 
-def makeHTMLDir(path):
+def createDir(path):
     try:
         os.mkdir(path)
     except OSError:
