@@ -50,10 +50,6 @@ def getHTML(site):
 def getHTMLParallel():
     html = getHTML(pages.get())
     writeToFile(html, saved.get())
-    # currentPage = pages.get()
-    # saveAs = saved.get()
-    # print(f'currentPage : {currentPage}')
-    # print(f'saveAs      : {saveAs}')
 
 def printDownload(currentPage, pageIndex, saveAs):
     print(f'currentPage : {currentPage}')
