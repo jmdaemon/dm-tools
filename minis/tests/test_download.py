@@ -35,10 +35,10 @@ def test_writeToFile_OutputsFile():
         f.close()
         os.remove(testFile)
 
-def test_getHTML_ReturnsHTML():
-    site = "https://www.shapeways.com/designer/mz4250/creations"
-    page = downloader.Downloader.getHTML(site)
-    assert(page is not None)
+# def test_getHTML_ReturnsHTML():
+    # site = "https://www.shapeways.com/designer/mz4250/creations"
+    # page = downloader.Downloader.getHTML(site)
+    # assert(page is not None)
 
 def test_getEnd_ReturnsInteger(createSoup):
     pages = downloader.getPages(createSoup)

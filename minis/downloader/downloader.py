@@ -22,6 +22,9 @@ HTML       = "./html"
 
 class Downloader: 
 
+    pages = queue.Queue()
+    saved = queue.Queue()
+
     def __init__(self, soup):
         self.soup       = createSoup(homepage)
 
@@ -29,22 +32,16 @@ class Downloader:
         with open(fileName, 'r') as f: 
             soup = BeautifulSoup(f, 'html.parser')
             return soup
-
-    pages = queue.Queue()
-    saved = queue.Queue()
-
-    def getHTML(site): 
-        page = requests.get(site)
-        return page.text
-
-    def getHTMLParallel():
-        html = getHTML(pages.get())
-        writeToFile(html, saved.get())
+    
+    def saveHTML():
+        html = requests.get(pages.get()).text
+        # downloader.printDownload(currentPage, pageIndex, saveAs)
+        # writeToFile(html, saved.get())
 
     def downloadHTML():
         while (not pages.empty() and not saved.empty()):
             if (threading.active_count() <= 4):
-                worker = threading.Thread(target=getHTMLParallel)
+                worker = threading.Thread(target=saveHTML)
                 worker.start()
             else:
                 for thread in threading.enumerate():
@@ -53,9 +50,11 @@ class Downloader:
                     else: 
                         thread.join()
 
-    def getAllHTML(end, site, directory):
+    # def getAllHTML(end, site, directory):
+    def getAllHTML(directory):
         index = 1
         pageIndex = 0
+        end = getEnd(getPages(self.soup))
         while (pageIndex < end):
             currentPage, saveAs = Pages.getHTMLPage(pageIndex, index)
             if (not os.path.exists(saveAs)):
@@ -63,8 +62,7 @@ class Downloader:
             pageIndex += 48
             index += 1
 
-        pageIndex = end 
-        currentPage, saveAs = Pages.getHTMLPage(pageIndex, index)
+        currentPage, saveAs = Pages.getHTMLPage(end, index)
         Pages.pushBackPage(currentPage, saveAs)
         downloadHTML()
 
@@ -83,7 +81,7 @@ class Downloader:
         }
         return headers
 
-    def downloadMini(soup, creds_file = 'creds.json'):
+    def downloadMini(creds_file = 'creds.json'):
         if (ids.empty() or names.empty() or minis_links.empty()):
             print(f"No miniatures to download...")
             return
