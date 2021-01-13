@@ -21,23 +21,6 @@ from requests.auth import HTTPBasicAuth
 pages = queue.Queue()
 saved = queue.Queue()
 
-def createSoup(fileName):
-    with open(fileName, 'r') as f: 
-        soup = BeautifulSoup(f, 'html.parser')
-        return soup
-
-def createDir(path):
-    try:
-        os.mkdir(path)
-    except OSError:
-        print ("Creation of the directory %s failed" % path)
-    else:
-        print ("Successfully created the directory %s " % path)
-
-def writeToFile(html, fileName):
-    with open(fileName, 'w') as f:
-        f.write(html)
-
 def getHTML(site): 
     page = requests.get(site)
     return page.text
@@ -127,7 +110,7 @@ def downloadMini(soup, creds_file = 'creds.json'):
     # print (mini.request.headers)
 
 # path = "./html"
-site = "https://www.shapeways.com/designer/mz4250/creations"
+# site = "https://www.shapeways.com/designer/mz4250/creations"
 
 # writeToFile(getHTMLPage(site), path + "/mz4250-creations-page-1")
 # getAllHTML(end)
@@ -135,7 +118,7 @@ site = "https://www.shapeways.com/designer/mz4250/creations"
 # end = getEnd(getPages(createSoup("creations.html")))
 # getAllHTML(end, site, "./html")
 # soup = createSoup("creations.html")
-soup = createSoup("./html/mz4250-creations-page-1")
+# soup = createSoup("./html/mz4250-creations-page-1")
 
 # links = getLinks(site, soup)
 # getNames(site, soup)
