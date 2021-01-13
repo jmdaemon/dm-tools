@@ -16,7 +16,20 @@ import json
 # 6. Create master index hash table.
 # 7. Look up each url, get the file, download and save as filename
 
-class Downloader:
+# Constants 
+site       = "https://www.shapeways.com/designer/mz4250/creations"
+HTML       = "./html"
+
+class Downloader: 
+
+    def __init__(self, soup):
+        self.soup       = createSoup(homepage)
+
+    def createSoup(fileName = "creations.html"):
+        with open(fileName, 'r') as f: 
+            soup = BeautifulSoup(f, 'html.parser')
+            return soup
+
     pages = queue.Queue()
     saved = queue.Queue()
 

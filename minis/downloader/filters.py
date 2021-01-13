@@ -2,11 +2,6 @@ from bs4 import BeautifulSoup
 import re
 import queue
 
-def createSoup(fileName):
-    with open(fileName, 'r') as f: 
-        soup = BeautifulSoup(f, 'html.parser')
-        return soup
-
 def getEnd(tag):
     exp = "(?<=\/designer\/mz4250\/creations\?s=)(\d{1,4})(?=#more-products)"
     regexp = re.compile(exp)
