@@ -4,7 +4,8 @@ import os
 import requests
 import cProfile
 
-import downloadAllMinis
+# import downloader.downloadAllMinis
+import downloader.downloadAllMinis
 # import unittest
 
 import pytest
@@ -17,18 +18,18 @@ def createSoup():
     return soup
 
 def test_getPages_ShouldReturnsSoup(createSoup):
-    pages = downloadAllMinis.getPages(createSoup)
+    pages = downloader.downloadAllMinis.getPages(createSoup)
     assert(pages is not None)
 
 def test_makeHTMLDir_ShouldCreateDir():
     path = "testpath"
-    downloadAllMinis.makeHTMLDir(path)
+    downloader.downloadAllMinis.makeHTMLDir(path)
     assert(os.path.exists(path))
     os.rmdir(path)
 
 def test_writeToFileShouldCreateFile(): 
     testFile = "testFile.txt"
-    downloadAllMinis.writeToFile("Writing to file", testFile)
+    downloader.downloadAllMinis.writeToFile("Writing to file", testFile)
     assert(os.path.exists(testFile))
     try:
         f = open(testFile, "r")
@@ -41,11 +42,11 @@ def test_writeToFileShouldCreateFile():
 
 def test_getHTML_ReturnsHTML():
     site = "https://www.shapeways.com/designer/mz4250/creations"
-    page = downloadAllMinis.getHTML(site)
+    page = downloader.downloadAllMinis.getHTML(site)
     assert(page is not None)
 
 def test_getEnd_ReturnsInteger(createSoup):
-    pages = downloadAllMinis.getPages(createSoup)
+    pages = downloader.downloadAllMinis.getPages(createSoup)
     assert(pages is not None)
-    end = downloadAllMinis.getEnd(pages)
+    end = downloader.downloadAllMinis.getEnd(pages)
     assert(end is not None)
