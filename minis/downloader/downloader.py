@@ -2,11 +2,9 @@ from bs4 import BeautifulSoup
 import re
 import os
 import requests
-import cProfile
+from requests.auth import HTTPBasicAuth
 import threading, queue
 import json
-
-from requests.auth import HTTPBasicAuth
 
 # downloadAllMinis.py - Downloads .stl files of miniatures
 
