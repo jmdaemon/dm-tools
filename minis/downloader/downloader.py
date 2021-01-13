@@ -41,11 +41,6 @@ class Downloader:
         html = getHTML(pages.get())
         writeToFile(html, saved.get())
 
-    def printDownload(currentPage, pageIndex, saveAs):
-        print(f'currentPage : {currentPage}')
-        print(f'pageIndex   : {pageIndex}')
-        print(f'saveAs      : {saveAs}')
-
     def downloadHTML():
         while (not pages.empty() and not saved.empty()):
             if (threading.active_count() <= 4):
@@ -88,12 +83,6 @@ class Downloader:
         }
         return headers
 
-    def printMiniMetadata(mini_id, name, downloadLink):
-        print(f"mini_id         : {mini_id}")
-        print(f"name            : {name}")
-        print(f"downloadLink    : {downloadLink}")
-        print(f"")
-
     def downloadMini(soup, creds_file = 'creds.json'):
         if (ids.empty() or names.empty() or minis_links.empty()):
             print(f"No miniatures to download...")
@@ -102,7 +91,7 @@ class Downloader:
         mini_id         = ids.get()
         name            = names.get()
         downloadLink    = (f'https://www.shapeways.com/product/download/{mini_id}')
-        printMiniMetadata(mini_id, name, downloadLink)
+        # printMiniMetadata(mini_id, name, downloadLink)
 
         session = requests.Session()
         headers = createHeaders()
