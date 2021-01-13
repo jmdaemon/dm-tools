@@ -6,8 +6,6 @@ import cProfile
 import threading, queue
 import json
 
-
-
 from requests.auth import HTTPBasicAuth
 
 # downloadAllMinis.py - Downloads .stl files of miniatures
@@ -144,21 +142,26 @@ def createHeaders():
     }
     return headers
 
-def downloadMiniature(soup):
-    # link = links.get()
+def printMiniMetadata(mini_id, name, downloadLink):
+    print(f"mini_id         : {mini_id}")
+    print(f"name            : {name}")
+    print(f"downloadLink    : {downloadLink}")
+    print(f"")
 
-    # while (not ids.empty() and not names.empty())
-    mini_id    = ids.get()
-    name       = names.get()
-    downloadLink = (f'https://www.shapeways.com/product/download/{mini_id}')
+def downloadMini(soup, creds_file = 'creds.json'):
+    if (ids.empty() or names.empty() or minis_links.empty()):
+        print(f"No miniatures to download...")
+        return
 
-    print(mini_id)
-    print(downloadLink)
+    mini_id         = ids.get()
+    name            = names.get()
+    downloadLink    = (f'https://www.shapeways.com/product/download/{mini_id}')
+    printMiniMetadata(mini_id, name, downloadLink)
 
     session = requests.Session()
     headers = createHeaders()
 
-    with open('creds.json') as f: 
+    with open(creds_file) as f: 
         data = json.load(f)
 
     print(data['username'] + " " + data['password'])
@@ -171,21 +174,6 @@ def downloadMiniature(soup):
 
     # print (mini.headers)
     # print (mini.request.headers)
-
-
-
-    # print(mini.request.headers)
-    # print(requests.is_downloadable(downloadLink))
-    # print(is_downloadable(downloadLink))
-    # mini = requests.get(downloadLink, allow_redirects=True)
-    # print(mini)
-    # print(mini.content)
-    # print(mini.text)
-
-
-    # print(f'link: {link}')
-    # print(f'name: {name}')
-
 
 # path = "./html"
 site = "https://www.shapeways.com/designer/mz4250/creations"
@@ -201,6 +189,4 @@ soup = createSoup("./html/mz4250-creations-page-1")
 links = getLinks(site, soup)
 getNames(site, soup)
 getIds(links, soup)
-downloadMiniature(soup)
-# print(links)
-# print(names)
+downloadMini(soup)
