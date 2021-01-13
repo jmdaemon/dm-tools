@@ -26,11 +26,6 @@ def createSoup(filename):
     soup = BeautifulSoup(f, 'html.parser')
     return soup
 
-def getPages(soup):
-    regexp = "(\/designer\/mz4250\/creations\?s=\d{0,4}#more-products)"
-    pages = soup.find_all('a', href = re.compile(regexp))
-    return pages
-
 def makeHTMLDir(path):
     try:
         os.mkdir(path)
@@ -68,28 +63,19 @@ def downloadHTML():
                 else: 
                     thread.join()
 
-def getHTMLPage(pageIndex, index):
-    currentPage = (f'{site}?s={pageIndex}') 
-    saveAs = (f'{directory}/mz4250-creations-page-{index}') 
-    return currentPage, saveAs
-
-def pushBackPage(currentPage, saveAs):
-    pages.put(currentPage)
-    saved.put(saveAs)
-
 def getAllHTML(end, site, directory):
     index = 1
     pageIndex = 0
     while (pageIndex < end):
-        currentPage, saveAs = getHTMLPage(pageIndex, index)
+        currentPage, saveAs = Pages.getHTMLPage(pageIndex, index)
         if (not os.path.exists(saveAs)):
-            pushBackPage(currentPage, saveAs)
+            Pages.pushBackPage(currentPage, saveAs)
         pageIndex += 48
         index += 1
 
     pageIndex = end 
-    currentPage, saveAs = getHTMLPage(pageIndex, index)
-    pushBackPage(currentPage, saveAs)
+    currentPage, saveAs = Pages.getHTMLPage(pageIndex, index)
+    Pages.pushBackPage(currentPage, saveAs)
     downloadHTML()
 
 def getEnd(tag):

@@ -5,21 +5,19 @@ import requests
 import cProfile
 
 # import downloader.downloadAllMinis
-import downloader.downloadAllMinis
+# import downloader.downloadAllMinis
+# import downloader.Pages
+# import downloader.Pages
 # import unittest
+import downloader
 
 import pytest
-
 
 @pytest.fixture
 def createSoup():
     f = open("creations.html", "r")
     soup = BeautifulSoup(f, 'html.parser')
     return soup
-
-def test_getPages_ShouldReturnsSoup(createSoup):
-    pages = downloader.downloadAllMinis.getPages(createSoup)
-    assert(pages is not None)
 
 def test_makeHTMLDir_ShouldCreateDir():
     path = "testpath"
@@ -46,7 +44,7 @@ def test_getHTML_ReturnsHTML():
     assert(page is not None)
 
 def test_getEnd_ReturnsInteger(createSoup):
-    pages = downloader.downloadAllMinis.getPages(createSoup)
+    pages = downloader.Pages.getPages(createSoup)
     assert(pages is not None)
     end = downloader.downloadAllMinis.getEnd(pages)
     assert(end is not None)
