@@ -1,3 +1,3 @@
-from .downloadAllMinis import *
-from .Pages import *
-from .Filters import *
+from .downloader import *
+from .pages import *
+from .filters import *

@@ -4,9 +4,8 @@ import os
 import requests
 import cProfile
 
-# import downloader.downloadAllMinis
-# import downloader.Pages
 import downloader
+import pytest
 
 @pytest.fixture
 def createSoup():
@@ -15,5 +14,5 @@ def createSoup():
     return soup
 
 def test_getPages_ShouldReturnsSoup(createSoup):
-    pages = downloader.downloadAllMinis.getPages(createSoup)
+    pages = downloader.getPages(createSoup)
     assert(pages is not None)
