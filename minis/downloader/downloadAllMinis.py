@@ -78,39 +78,9 @@ def getAllHTML(end, site, directory):
     Pages.pushBackPage(currentPage, saveAs)
     downloadHTML()
 
-def getEnd(tag):
-    exp = "(?<=\/designer\/mz4250\/creations\?s=)(\d{1,4})(?=#more-products)"
-    regexp = re.compile(exp)
-    index = regexp.search(tag[5]['href'])
-    return int(index.group(0))
-
 minis_links = queue.Queue()
 ids = queue.Queue()
 names = queue.Queue()
-
-def getLinks(site, soup):
-    exp = r"\"?(https:\/\/www\.shapeways.com\/product\/\w{9}\/)(\w*\-*)*(\?optionId=\d{1,16})(.*user-profile)\"?"
-    URLS = soup.find_all('a', href = re.compile(exp))
-
-    links = set()
-    for url in URLS:
-        link = url['href']
-        links.add(link)
-        minis_links.put(link)
-    return links
-
-def getNames(site, soup):
-    results = soup.find_all('a', 'product-url', text=True)
-    for result in results:
-        names.put(result.get_text())
-
-def getIds(links, soup): 
-    exp = r"(\"?)(?<=https:\/\/www\.shapeways\.com\/product\/)(\w+)"
-    regex = re.compile(exp)
-
-    for link in links:
-        match = regex.search(link)
-        ids.put(match.group(0))
 
 def createHeaders():
     headers = { 
@@ -167,7 +137,7 @@ site = "https://www.shapeways.com/designer/mz4250/creations"
 # soup = createSoup("creations.html")
 soup = createSoup("./html/mz4250-creations-page-1")
 
-links = getLinks(site, soup)
-getNames(site, soup)
-getIds(links, soup)
-downloadMini(soup)
+# links = getLinks(site, soup)
+# getNames(site, soup)
+# getIds(links, soup)
+# downloadMini(soup)

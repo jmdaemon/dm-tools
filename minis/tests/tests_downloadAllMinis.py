@@ -46,5 +46,5 @@ def test_getHTML_ReturnsHTML():
 def test_getEnd_ReturnsInteger(createSoup):
     pages = downloader.Pages.getPages(createSoup)
     assert(pages is not None)
-    end = downloader.downloadAllMinis.getEnd(pages)
+    end = downloader.Filters.getEnd(pages)
     assert(end is not None)
