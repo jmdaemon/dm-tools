@@ -37,7 +37,7 @@ def test_writeToFile_OutputsFile():
 
 def test_getHTML_ReturnsHTML():
     site = "https://www.shapeways.com/designer/mz4250/creations"
-    page = downloader.getHTML(site)
+    page = downloader.Downloader.getHTML(site)
     assert(page is not None)
 
 def test_getEnd_ReturnsInteger(createSoup):
