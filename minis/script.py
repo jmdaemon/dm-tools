@@ -2,9 +2,31 @@
 
 import downloader
 
-def downloadHTMLIndices():
-    soup = downloader.createSoup("creations.html")
-    downloader.getAllHTML(soup, "./null")
+# 1. Setup Class
+# Set 
+# .soup = createSoup(fileName)
+# .site = "" (constant)
+# .path = "./html"
 
-# def downloadAllMinis():
+# 2. Get All HTML Files
+# getAllHTML()
+
+# 3. Create the download links, and download all of the miniatures
+# Set links, ids, names queues
+# downloadMini()
+
+soup = downloader.createSoup("creations.html")
+# site = "creations.html"
+site = "https://www.shapeways.com/designer/mz4250/creations"
+
+def downloadHTMLIndices():
+    downloader.getAllHTML(soup, "./html")
+
+def downloadAllMinis():
+    links = downloader.getLinks(site, soup)
+    downloader.getIds(links, soup)
+    downloader.getNames(site, soup)
+    downloader.downloadMini()
 # def createMasterIndex():
+
+downloadAllMinis()

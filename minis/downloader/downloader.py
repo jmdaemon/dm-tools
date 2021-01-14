@@ -6,8 +6,8 @@ from requests.auth import HTTPBasicAuth
 import threading, queue
 import json
 
-from .pages import *
-from .filters import getEnd
+# from .pages import *
+# from .filters import getEnd
 from .show_info import *
 
 # downloadAllMinis.py - Downloads .stl files of miniatures
@@ -29,17 +29,17 @@ def createSoup(fileName):
         soup = BeautifulSoup(f, 'html.parser')
         return soup
 
-pages = queue.Queue()
-saved = queue.Queue()
+
+pages = queue.Queue() # pages => HTML Pages
+saved = queue.Queue() # saved => Save HTML Pages As [filename]
+
+minis_links = queue.Queue() # Links to Minis
+ids = queue.Queue()         # Product-ID
+names = queue.Queue()       # Mini Name
 
 def saveHTML():
-    # html = requests.get(pages.get()).text
-    # downloader.printDownload(currentPage, pageIndex, saveAs)
-    # writeToFile(html, saved.get())
-    page = pages.get()
-    save = saved.get()
-    print(f'page: {page}')
-    print(f'page: {save}')
+    html = requests.get(pages.get()).text
+    writeToFile(html, saved.get())
 
 def downloadHTML():
     while (not pages.empty() and not saved.empty()):
@@ -53,14 +53,24 @@ def downloadHTML():
                 else: 
                     thread.join()
 
-# def getAllHTML(end, site, directory):
+def getPages(soup):
+    regexp = "(\/designer\/mz4250\/creations\?s=\d{0,4}#more-products)"
+    pages = soup.find_all('a', href = re.compile(regexp))
+    return pages
+
+def pushBackPage(currentPage, saveAs):
+    pages.put(currentPage)
+    saved.put(saveAs)
+
+def getHTMLPage(site, pageIndex, index, directory):
+    currentPage = (f'{site}?s={pageIndex}') 
+    saveAs = (f'{directory}/mz4250-creations-page-{index}') 
+    return currentPage, saveAs
+
 def getAllHTML(soup, directory, index = 1, pageIndex = 0):
-    # index = 1
-    # pageIndex = 0
     end = getEnd(getPages(soup))
     while (pageIndex < end):
         currentPage, saveAs = getHTMLPage(site, pageIndex, index, directory)
-        printDownload(currentPage, pageIndex, saveAs)
         if (not os.path.exists(saveAs)):
             pushBackPage(currentPage, saveAs, pages, saved)
         pageIndex += 48
@@ -68,12 +78,7 @@ def getAllHTML(soup, directory, index = 1, pageIndex = 0):
 
     currentPage, saveAs = getHTMLPage(site, end, index, directory)
     pushBackPage(currentPage, saveAs, pages, saved)
-    printDownload(currentPage, pageIndex, saveAs)
     downloadHTML()
-
-minis_links = queue.Queue()
-ids = queue.Queue()
-names = queue.Queue()
 
 def createHeaders():
     headers = { 
@@ -86,7 +91,44 @@ def createHeaders():
     }
     return headers
 
-def downloadMini(creds_file = 'creds.json'):
+def loadCredentials(creds_file = 'creds.json'):
+    with open(creds_file) as f: 
+        data = json.load(f)
+    return data['username'], data['password']
+
+def getEnd(tag):
+    exp = "(?<=\/designer\/mz4250\/creations\?s=)(\d{1,4})(?=#more-products)"
+    regexp = re.compile(exp)
+    index = regexp.search(tag[5]['href'])
+    return int(index.group(0))
+
+def getLinks(site, soup):
+# def getLinks(site, soup):
+    exp = r"\"?(https:\/\/www\.shapeways.com\/product\/\w{9}\/)(\w*\-*)*(\?optionId=\d{1,16})(.*user-profile)\"?"
+    URLS = soup.find_all('a', href = re.compile(exp))
+
+    links = set()
+    for url in URLS:
+        link = url['href']
+        links.add(link)
+        minis_links.put(link)
+    return links
+
+def getNames(site, soup):
+    results = soup.find_all('a', 'product-url', text=True)
+    for result in results:
+        names.put(result.get_text())
+
+def getIds(links, soup): 
+    exp = r"(\"?)(?<=https:\/\/www\.shapeways\.com\/product\/)(\w+)"
+    regex = re.compile(exp)
+
+    for link in links:
+        match = regex.search(link)
+        ids.put(match.group(0))
+
+
+def downloadMini():
     if (ids.empty() or names.empty() or minis_links.empty()):
         print(f"No miniatures to download...")
         return
@@ -94,15 +136,14 @@ def downloadMini(creds_file = 'creds.json'):
     mini_id         = ids.get()
     name            = names.get()
     downloadLink    = (f'https://www.shapeways.com/product/download/{mini_id}')
-    # printMiniMetadata(mini_id, name, downloadLink)
 
     session = requests.Session()
     headers = createHeaders()
 
-    with open(creds_file) as f: 
-        data = json.load(f)
+    print(loadCredentials())
 
-    print(data['username'] + " " + data['password'])
+
+    # print(data['username'] + " " + data['password'])
 
     # mini = session.get(downloadLink, allow_redirects=True, headers=headers, auth=(data['username'], data['password']))
     # if (mini.status_code != 404):
@@ -112,19 +153,6 @@ def downloadMini(creds_file = 'creds.json'):
 
     # print (mini.headers)
     # print (mini.request.headers)
-
-# 1. Setup Class
-# Set 
-# .soup = createSoup(fileName)
-# .site = "" (constant)
-# .path = "./html"
-
-# 2. Get All HTML Files
-# getAllHTML()
-
-# 3. Create the download links, and download all of the miniatures
-# Set links, ids, names queues
-# downloadMini()
 
 # path = "./html"
 # site = "https://www.shapeways.com/designer/mz4250/creations"
