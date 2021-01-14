@@ -124,17 +124,17 @@ def getLinks(site, soup):
     print(f"")
     return linkDict
 
+def removeEmpty(name): 
+    if(name): # if null
+        return True
+    else:
+        return False
+
 def getNames(site, soup):
     exp = r"\"?(https://www.shapeways.com/product/\w{9}/)(\w*-*)*(\?optionId=\d{1,16})(.*user-profile)\"?"
     results = soup.find_all('a', href = re.compile(exp))
     print(f"============ Names ============")
-    nameList = []
-    for result in results:
-        name = result.get_text(strip=True)
-        if (not name):
-            continue
-        nameList.append(name)
-
+    nameList = list(filter(removeEmpty, map(lambda name: name.get_text(strip=True), results)))
     nameDict = dict.fromkeys(nameList, 1)
     for name in nameDict: 
         names.put(name)
