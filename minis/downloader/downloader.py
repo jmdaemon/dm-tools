@@ -41,9 +41,9 @@ def createDir(path):
     else:
         print ("Successfully created the directory %s " % path)
 
-def writeToFile(html, fileName):
-    with open(fileName, 'w') as f:
-        f.write(html)
+def writeToFile(content, fileName, modes = 'w'):
+    with open(fileName, modes) as f:
+        f.write(content)
 
 def saveHTML():
     html = requests.get(pages.get()).text
@@ -144,10 +144,6 @@ def getIds(links, soup):
     pushOntoQueue("Ids", "ids", idsList, ids)
 
 def downloadMini():
-    if (ids.empty() or names.empty() or minis_links.empty()):
-        print(f"No miniatures to download...")
-        return
-
     # while (not ids.empty() and not names.empty()):
     mini_id         = ids.get()
     name            = names.get()
@@ -157,5 +153,4 @@ def downloadMini():
     session = requests.Session()
     mini = session.get(downloadLink, allow_redirects=True, headers=createHeaders(), auth=(loadCredentials()))
     if (mini.status_code != 404):
-        with open(f"{name}.zip", 'wb') as f:
-            f.write(mini.content)
+        writeToFile(mini.content, f"{name}.zip", 'wb')
