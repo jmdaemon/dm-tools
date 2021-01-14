@@ -45,8 +45,9 @@ def writeToFile(content, fileName, modes = 'w'):
         f.write(content)
 
 def saveHTML():
-    html = requests.get(pages.get()).text
-    writeToFile(html, saved.get())
+    # html = requests.get(pages.get()).text
+    # writeToFile(html, saved.get())
+    printQueues(pages, saved)
 
 def downloadHTML():
     while (not pages.empty() and not saved.empty()):
@@ -54,21 +55,12 @@ def downloadHTML():
             worker = threading.Thread(target=saveHTML)
             worker.start()
         else:
-            for thread in threading.enumerate():
-                if (thread is threading.main_thread()): 
-                    continue
-                else: 
-                    thread.join()
+            list = [thread.join for thread in threading.enumerate() if thread is not threading.main_thread()]
 
 def getPages(soup):
     regexp = r"(/designer/mz4250/creations\?s=\d{0,4}#more-products)"
     pages = soup.find_all('a', href = re.compile(regexp))
     return pages
-
-def formatURLAndFile(site, pageIndex, index, directory):
-    currentPage = (f'{site}?s={pageIndex}') 
-    saveAs = (f'{directory}/mz4250-creations-page-{index}') 
-    return currentPage, saveAs
 
 def genPageOffsets(offset, end):
     while (offset < end):
@@ -86,10 +78,8 @@ def getAllHTML(soup, directory = "./html", index = 1, offset = 0, dry_run = Fals
     if (os.path.exists(directory)):
         print(f"Directory {directory} already exists.")
         return
-    end = getEnd(getPages(soup)) 
-    pagesList = [f'{site}?s={offset}' for offset in genPageOffsets(offset, end)]
+    pagesList = [f'{site}?s={offset}' for offset in genPageOffsets(offset, getEnd(getPages(soup)))]
     savedList = [f'{directory}/mz4250-creations-page-{index}' for index in genSaveOffsets(pagesList, index)]
-
     list = [pages.put(page) for page in pagesList]
     list = [saved.put(saveFile) for saveFile in savedList]
     if (not dry_run):

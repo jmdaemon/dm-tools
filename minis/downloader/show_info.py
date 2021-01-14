@@ -9,3 +9,7 @@ def printMiniMetadata(mini_id, name, downloadLink):
     print(f"name            : {name}")
     print(f"downloadLink    : {downloadLink}")
     print(f"")
+
+def printQueues(pages, saved):
+    print(f"page: {pages.get()}")
+    print(f"save: {saved.get()}")
