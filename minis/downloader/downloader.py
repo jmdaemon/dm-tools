@@ -6,6 +6,10 @@ from requests.auth import HTTPBasicAuth
 import threading, queue
 import json
 
+from .pages import *
+from .filters import getEnd
+from .show_info import *
+
 # downloadAllMinis.py - Downloads .stl files of miniatures
 
 # Process
@@ -20,93 +24,94 @@ import json
 site       = "https://www.shapeways.com/designer/mz4250/creations"
 HTML       = "./html"
 
-class Downloader: 
+def createSoup(fileName):
+    with open(fileName, 'r') as f: 
+        soup = BeautifulSoup(f, 'html.parser')
+        return soup
 
-    pages = queue.Queue()
-    saved = queue.Queue()
+pages = queue.Queue()
+saved = queue.Queue()
 
-    def __init__(self, soup):
-        self.soup       = createSoup(homepage)
+def saveHTML():
+    # html = requests.get(pages.get()).text
+    # downloader.printDownload(currentPage, pageIndex, saveAs)
+    # writeToFile(html, saved.get())
+    page = pages.get()
+    save = saved.get()
+    print(f'page: {page}')
+    print(f'page: {save}')
 
-    def createSoup(fileName = "creations.html"):
-        with open(fileName, 'r') as f: 
-            soup = BeautifulSoup(f, 'html.parser')
-            return soup
-    
-    def saveHTML():
-        html = requests.get(pages.get()).text
-        # downloader.printDownload(currentPage, pageIndex, saveAs)
-        # writeToFile(html, saved.get())
+def downloadHTML():
+    while (not pages.empty() and not saved.empty()):
+        if (threading.active_count() <= 4):
+            worker = threading.Thread(target=saveHTML)
+            worker.start()
+        else:
+            for thread in threading.enumerate():
+                if (thread is threading.main_thread()): 
+                    continue
+                else: 
+                    thread.join()
 
-    def downloadHTML():
-        while (not pages.empty() and not saved.empty()):
-            if (threading.active_count() <= 4):
-                worker = threading.Thread(target=saveHTML)
-                worker.start()
-            else:
-                for thread in threading.enumerate():
-                    if (thread is threading.main_thread()): 
-                        continue
-                    else: 
-                        thread.join()
+# def getAllHTML(end, site, directory):
+def getAllHTML(soup, directory, index = 1, pageIndex = 0):
+    # index = 1
+    # pageIndex = 0
+    end = getEnd(getPages(soup))
+    while (pageIndex < end):
+        currentPage, saveAs = getHTMLPage(site, pageIndex, index, directory)
+        printDownload(currentPage, pageIndex, saveAs)
+        if (not os.path.exists(saveAs)):
+            pushBackPage(currentPage, saveAs, pages, saved)
+        pageIndex += 48
+        index += 1
 
-    # def getAllHTML(end, site, directory):
-    def getAllHTML(directory):
-        index = 1
-        pageIndex = 0
-        end = getEnd(getPages(self.soup))
-        while (pageIndex < end):
-            currentPage, saveAs = Pages.getHTMLPage(pageIndex, index)
-            if (not os.path.exists(saveAs)):
-                Pages.pushBackPage(currentPage, saveAs)
-            pageIndex += 48
-            index += 1
+    currentPage, saveAs = getHTMLPage(site, end, index, directory)
+    pushBackPage(currentPage, saveAs, pages, saved)
+    printDownload(currentPage, pageIndex, saveAs)
+    downloadHTML()
 
-        currentPage, saveAs = Pages.getHTMLPage(end, index)
-        Pages.pushBackPage(currentPage, saveAs)
-        downloadHTML()
+minis_links = queue.Queue()
+ids = queue.Queue()
+names = queue.Queue()
 
-    minis_links = queue.Queue()
-    ids = queue.Queue()
-    names = queue.Queue()
+def createHeaders():
+    headers = { 
+        'Content-type': 'application/zip',
+        'Host': 'www.shapeways.com',
+        'User-Agent': "Mozilla/5.0 (X11; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0",
+        'Accept': "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        'Referer': minis_links.get(),
+        'Cookie': '__cfduid=dd4e4ad5a12f3eeb9a89139f43b137d211608008733; shapeways_guest=2ad9b47812f7643badebb042252d45aefa12e9eb; whid=9; PHPSESSID=u1bh765cf6oosb7dcco7433gdc; sw_usr=187af943d900b0a1753cb31f192f4f1f06854c9c; uauth=2343099'
+    }
+    return headers
 
-    def createHeaders():
-        headers = { 
-            'Content-type': 'application/zip',
-            'Host': 'www.shapeways.com',
-            'User-Agent': "Mozilla/5.0 (X11; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0",
-            'Accept': "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-            'Referer': minis_links.get(),
-            'Cookie': '__cfduid=dd4e4ad5a12f3eeb9a89139f43b137d211608008733; shapeways_guest=2ad9b47812f7643badebb042252d45aefa12e9eb; whid=9; PHPSESSID=u1bh765cf6oosb7dcco7433gdc; sw_usr=187af943d900b0a1753cb31f192f4f1f06854c9c; uauth=2343099'
-        }
-        return headers
+def downloadMini(creds_file = 'creds.json'):
+    if (ids.empty() or names.empty() or minis_links.empty()):
+        print(f"No miniatures to download...")
+        return
 
-    def downloadMini(creds_file = 'creds.json'):
-        if (ids.empty() or names.empty() or minis_links.empty()):
-            print(f"No miniatures to download...")
-            return
+    mini_id         = ids.get()
+    name            = names.get()
+    downloadLink    = (f'https://www.shapeways.com/product/download/{mini_id}')
+    # printMiniMetadata(mini_id, name, downloadLink)
 
-        mini_id         = ids.get()
-        name            = names.get()
-        downloadLink    = (f'https://www.shapeways.com/product/download/{mini_id}')
-        # printMiniMetadata(mini_id, name, downloadLink)
+    session = requests.Session()
+    headers = createHeaders()
 
-        session = requests.Session()
-        headers = createHeaders()
+    with open(creds_file) as f: 
+        data = json.load(f)
 
-        with open(creds_file) as f: 
-            data = json.load(f)
+    print(data['username'] + " " + data['password'])
 
-        print(data['username'] + " " + data['password'])
+    # mini = session.get(downloadLink, allow_redirects=True, headers=headers, auth=(data['username'], data['password']))
+    # if (mini.status_code != 404):
+        # print(mini.text)
+        # with open('test.zip', 'wb') as f:
+            # f.write(mini.content)
 
-        # mini = session.get(downloadLink, allow_redirects=True, headers=headers, auth=(data['username'], data['password']))
-        # if (mini.status_code != 404):
-            # print(mini.text)
-            # with open('test.zip', 'wb') as f:
-                # f.write(mini.content)
-
-        # print (mini.headers)
-        # print (mini.request.headers)
+    # print (mini.headers)
+    # print (mini.request.headers)
 
 # 1. Setup Class
 # Set 

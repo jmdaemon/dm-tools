@@ -7,7 +7,7 @@ def getPages(soup):
     pages = soup.find_all('a', href = re.compile(regexp))
     return pages
 
-def getHTMLPage(pageIndex, index):
+def getHTMLPage(site, pageIndex, index, directory):
     currentPage = (f'{site}?s={pageIndex}') 
     saveAs = (f'{directory}/mz4250-creations-page-{index}') 
     return currentPage, saveAs
