@@ -61,18 +61,12 @@ def getPages(soup):
     pages = soup.find_all('a', href = re.compile(regexp))
     return pages
 
-def genPageOffsets(offset, end):
-    while (offset < end):
-        yield offset
-        offset += 48
-    yield end
-    return 
-
 def getAllHTML(soup, directory = "./html", index = 1, offset = 0, dry_run = False):
     if (os.path.exists(directory)):
         print(f"Directory {directory} already exists.")
         return
-    pagesList = [f'{site}?s={offset}' for offset in genPageOffsets(offset, getEnd(getPages(soup)))]
+    end = getEnd(getPages(soup))
+    pagesList = [f'{site}?s={offset}' for offset in ([*range(offset, end, 48)] + [end])]
     savedList = [f'{directory}/mz4250-creations-page-{index}' for index in range(index, len(pagesList) + 1)]
     list = [pages.put(page) for page in pagesList]
     list = [saved.put(saveFile) for saveFile in savedList]
