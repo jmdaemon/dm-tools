@@ -18,7 +18,8 @@ from .show_info import *
 # 6. Create master index hash table.
 # 7. Look up each url, get the file, download and save as filename
 
-site       = "https://www.shapeways.com/designer/mz4250/creations"
+site        = "https://www.shapeways.com/designer/mz4250/creations"
+mini_dir    = "miniatures"
 
 pages = queue.Queue()       # pages => HTML Pages
 saved = queue.Queue()       # saved => Save HTML Pages As [filename]
@@ -49,30 +50,30 @@ def saveHTML():
     html = requests.get(pages.get()).text
     writeToFile(html, saved.get())
 
-def downloadHTML():
-    while (not pages.empty() and not saved.empty()):
-        if (threading.active_count() <= 4):
-            worker = threading.Thread(target=saveHTML)
-            worker.start()
+def download(firstQueue, secondQueue, target):
+    while (not firstQueue.empty() and not secondQueue.empty()):
+        if (threading.active_count() <= 4): worker = threading.Thread(target=target).start() 
         else:
             list = [thread.join for thread in threading.enumerate() if thread is not threading.main_thread()]
-
+    
 def getPages(soup):
     regexp = r"(/designer/mz4250/creations\?s=\d{0,4}#more-products)"
     pages = soup.find_all('a', href = re.compile(regexp))
     return pages
 
 def getAllHTML(soup, directory = "./html", index = 1, offset = 0, dry_run = False):
-    if (os.path.exists(directory)):
+    if(os.path.exists(directory)):
         print(f"Directory {directory} already exists.")
         return
+    elif (not os.path.exists(directory)):
+        os.makedirs(directory)
     end = getEnd(getPages(soup))
     pagesList = [f'{site}?s={offset}' for offset in ([*range(offset, end, 48)] + [end])]
     savedList = [f'{directory}/mz4250-creations-page-{index}' for index in range(index, len(pagesList) + 1)]
     list = [pages.put(page) for page in pagesList]
     list = [saved.put(saveFile) for saveFile in savedList]
-    if (not dry_run):
-        downloadHTML()
+    if (not dry_run): 
+        download(pages, saved, saveHTML)
 
 def createHeaders():
     headers = { 
@@ -129,19 +130,13 @@ def getIds(links, soup):
     idsList = [regex.search(link).group(0) for link in links]
     return pushOntoQueue("Ids", "ids", idsList, ids)
 
-def saveMini(directory):
-    mini = requests.get(downloadLinks.get(), allow_redirects=True, headers=createHeaders(), auth=(loadCredentials()))
-    if (mini.status_code != 404):
-        print(f"Saving as: {directory}/{names.get()}.zip")
-        writeToFile(mini.content, f"{directory}/{names.get()}.zip", 'wb')
-
-def downloadAllMinis(directory):
-    while (not downloadLinks.empty() and not names.empty()):
-        if (threading.active_count() <= 4):
-            worker = threading.Thread(target=saveMini, args=(directory,))
-            worker.start()
-        else:
-            list = [thread.join for thread in threading.enumerate() if thread is not threading.main_thread()]
+# def saveMini(directory):
+def saveMini():
+    # mini = requests.get(downloadLinks.get(), allow_redirects=True, headers=createHeaders(), auth=(loadCredentials()))
+    print(f"Saving as: {mini_dir}/{names.get()}.zip")
+    # if (mini.status_code != 404):
+        # print(f"Saving as: {mini_dir}/{names.get()}.zip")
+        # writeToFile(mini.content, f"{mini_dir}/{names.get()}.zip", 'wb')
 
 def downloadMini(mini_ids, directory = "miniatures"):
     if (not os.path.exists(directory)):
@@ -150,4 +145,7 @@ def downloadMini(mini_ids, directory = "miniatures"):
     # Make downloadLinks a queue and push new links in here
     # Multi-threaded download
     list = [downloadLinks.put(f'https://www.shapeways.com/product/download/{mini_id}') for mini_id in mini_ids]
-    downloadAllMinis(directory)
+    mini_dir = directory
+    # downloadAllMinis(directory)
+    download(downloadLinks, names, saveMini)
+    print(f"")

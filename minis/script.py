@@ -20,15 +20,21 @@ site = "https://www.shapeways.com/designer/mz4250/creations"
 
 def downloadHTMLIndices():
     # downloader.getAllHTML(soup, "./html")
-    downloader.getAllHTML(soup, "./null", dry_run=True)
-    # downloader.getAllHTML(soup, "./null")
+    # downloader.getAllHTML(soup, "./null", dry_run=True)
+    downloader.getAllHTML(soup, "./null")
 
 def downloadAllMinis():
     links = downloader.getLinks(site, soup)
     mini_ids = downloader.getIds(links, soup)
     downloader.getNames(site, soup)
     downloader.downloadMini(mini_ids)
-# def createMasterIndex():
 
-downloadAllMinis()
-# downloadHTMLIndices()
+def createMasterIndex():
+    links = downloader.getLinks(site, soup)
+    mini_ids = downloader.getIds(links, soup)
+    downloader.getNames(site, soup)
+    downloader.createIndex()
+
+downloadHTMLIndices()
+# downloadAllMinis()
+# createMasterIndex()
