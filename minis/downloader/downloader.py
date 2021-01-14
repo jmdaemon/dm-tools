@@ -16,8 +16,6 @@ mini_dir    = "miniatures"
 pages = queue.Queue()       # pages => HTML Pages
 saved = queue.Queue()       # saved => Save HTML Pages As [filename]
 
-# minis_links = queue.Queue() # Links to Minis
-# ids = queue.Queue()         # Product-ID
 names = queue.Queue()       # Mini Name
 downloadLinks = queue.Queue()
 
@@ -89,13 +87,7 @@ def getEnd(tag):
     return int(index.group(0))
 
 def pushOntoQueue(title, keyword, itemList, itemQueue):
-    print(f"============ {title} ============")
-    itemDict = dict.fromkeys(itemList, 1)
-    for item in itemDict:
-        itemQueue.put(item)
-        print(f"{keyword}: {item}")
-    print(f"")
-    return itemDict
+    list = [itemQueue.put(item) for item in createDict(title, keyword, itemList)]
 
 def removeEmpty(name): 
     if(name): # if null
@@ -106,8 +98,7 @@ def removeEmpty(name):
 def createDict(title, keyword, itemList):
     itemDict = dict.fromkeys(itemList, 1)
     print(f"============ {title} ============")
-    [print(f"{keyword}: {item}") for item in itemDict]
-    print(f"")
+    list = [print(f"{keyword}: {item}") for item in itemDict] + [print(f"")]
     return itemDict
 
 def getLinks(site, soup):
@@ -138,7 +129,7 @@ def saveMini():
 def downloadMini(mini_ids, directory = "miniatures"):
     if (not os.path.exists(directory)):
         os.makedirs(directory)
+        mini_dir = directory
     list = [downloadLinks.put(f'https://www.shapeways.com/product/download/{mini_id}') for mini_id in mini_ids]
-    mini_dir = directory
     download(downloadLinks, names, saveMini)
     print(f"")

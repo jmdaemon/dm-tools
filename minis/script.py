@@ -25,9 +25,9 @@ def downloadHTMLIndices():
 
 def downloadAllMinis():
     links = downloader.getLinks(site, soup)
-    mini_ids = downloader.getIds(links, soup)
+    minis_ids = downloader.getIds(links, soup)
     downloader.getNames(site, soup)
-    downloader.downloadMini(mini_ids)
+    downloader.downloadMini(minis_ids)
 
 def createMasterIndex():
     links = downloader.getLinks(site, soup)
