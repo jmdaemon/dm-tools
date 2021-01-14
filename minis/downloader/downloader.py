@@ -19,7 +19,6 @@ from .show_info import *
 # 7. Look up each url, get the file, download and save as filename
 
 site       = "https://www.shapeways.com/designer/mz4250/creations"
-HTML       = "./html"
 
 pages = queue.Queue()       # pages => HTML Pages
 saved = queue.Queue()       # saved => Save HTML Pages As [filename]
@@ -75,16 +74,59 @@ def formatURLAndFile(site, pageIndex, index, directory):
     saveAs = (f'{directory}/mz4250-creations-page-{index}') 
     return currentPage, saveAs
 
-def getAllHTML(soup, directory, index = 1, offset = 0):
+def genPageOffsets(offset, end):
+    while (offset < end):
+        yield offset
+        offset += 48
+    yield end
+    return 
+
+def genSaveOffsets(pageOffsets, index):
+    for page in pageOffsets:
+        # print(page)
+        yield index
+        index += 1
+
+def formatURL(site, pageOffset):
+    return (f'{site}?s={pageIndex}') 
+
+def getAllHTML(soup, directory = "./html", index = 1, offset = 0):
+    if (os.path.exists(directory)):
+        print(f"Directory {directory} already exists.")
+        return
     end = getEnd(getPages(soup))
+    # pages = []
+    # pages = genPageOffsets(offset, end)
+    pageOffsets = genPageOffsets(offset, end) 
+    savedOffsets = genSaveOffsets(pageOffsets, index)
+    # for saved in savedOffsets:
+        # print(saved)
+        
+    # pagesList = [f'{site}?s={offset}' for offset in pageOffsets]
+    savedList = [f'{directory}/mz4250-creations-page-{index}' for index in savedOffsets]
+    # savedList = [f'{directory}/mz4250-creations-page-{index}' for index in genSaveOffsets(pageOffsets, index)]
+    # for page in pagesList:
+        # print(page)
+    for saved in savedList:
+        print(saved)
+    # savedList =
+        
+    # while (offset < end):
+        # pages.append(f'{site}?s={offset}')
+        # offset += 48
+    # while (offset < end):
+        # currentPage = (f'{site}?s={pageIndex}') 
+        # saveAs = (f'{directory}/mz4250-creations-page-{index}') 
+    # pageOffsets = [offset += 48 if offset < end else end]
     while (offset < end):
         currentPage, saveAs = formatURLAndFile(site, offset, index, directory)
         if (not os.path.exists(saveAs)):
             pushBackPage(currentPage, saveAs)
-        pageIndex += 48
+        # pageIndex += 48
+        offset += 48
         index += 1
-    pushBackPage(formatURLAndFile(site, end, index, directory))
-    downloadHTML()
+    pushBackPage(*formatURLAndFile(site, end, index, directory))
+    # downloadHTML()
 
 def createHeaders():
     headers = { 
