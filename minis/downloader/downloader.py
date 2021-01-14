@@ -110,6 +110,12 @@ def getEnd(tag):
     index = regexp.search(tag[5]['href'])
     return int(index.group(0))
 
+def pushOntoQueue(keyword, itemDict, itemQueue):
+    for item in itemDict:
+        itemQueue.put(item)
+        print(f"{keyword}: {item}")
+    print(f"")
+
 def getLinks(site, soup):
     exp = r"\"?(https://www.shapeways.com/product/\w{9}/)(\w*-*)*(\?optionId=\d{1,16})(.*user-profile)\"?"
     URLS = soup.find_all('a', href = re.compile(exp))
@@ -118,10 +124,7 @@ def getLinks(site, soup):
     linkList = list(map(lambda url: url['href'], URLS))
 
     linkDict = dict.fromkeys(linkList, 1)
-    for link in linkDict: 
-        minis_links.put(link)
-        print(f"link: {link}")
-    print(f"")
+    pushOntoQueue("link", linkDict, minis_links)
     return linkDict
 
 def removeEmpty(name): 
@@ -136,10 +139,7 @@ def getNames(site, soup):
     print(f"============ Names ============")
     nameList = list(filter(removeEmpty, map(lambda name: name.get_text(strip=True), results)))
     nameDict = dict.fromkeys(nameList, 1)
-    for name in nameDict: 
-        names.put(name)
-        print(f"name: {name}")
-    print(f"")
+    pushOntoQueue("name", nameDict, names)
 
 def getIds(links, soup): 
     exp = r"(\"?)(?<=https://www.shapeways.com/product/)(\w+)"
