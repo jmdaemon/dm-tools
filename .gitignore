@@ -2,3 +2,7 @@
 *.html
 html
 __pycache__
+tags
+*.json
+*.zip
+*.egg-info
