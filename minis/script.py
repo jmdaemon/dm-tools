@@ -35,6 +35,6 @@ def createMasterIndex():
     downloader.getNames(site, soup)
     downloader.createIndex()
 
-downloadHTMLIndices()
-# downloadAllMinis()
+# downloadHTMLIndices()
+downloadAllMinis()
 # createMasterIndex()

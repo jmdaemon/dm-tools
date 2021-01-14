@@ -10,22 +10,14 @@ from .show_info import *
 
 # downloadAllMinis.py - Downloads .stl files of miniatures
 
-# Process
-# 1. Get all HTML Pages
-# 2. Get end of last HTML Page
-# 3. Iterate through all the pages, create list of urls to files
-# 4. Obtain list of names of all files
-# 6. Create master index hash table.
-# 7. Look up each url, get the file, download and save as filename
-
 site        = "https://www.shapeways.com/designer/mz4250/creations"
 mini_dir    = "miniatures"
 
 pages = queue.Queue()       # pages => HTML Pages
 saved = queue.Queue()       # saved => Save HTML Pages As [filename]
 
-minis_links = queue.Queue() # Links to Minis
-ids = queue.Queue()         # Product-ID
+# minis_links = queue.Queue() # Links to Minis
+# ids = queue.Queue()         # Product-ID
 names = queue.Queue()       # Mini Name
 downloadLinks = queue.Queue()
 
@@ -72,8 +64,7 @@ def getAllHTML(soup, directory = "./html", index = 1, offset = 0, dry_run = Fals
     savedList = [f'{directory}/mz4250-creations-page-{index}' for index in range(index, len(pagesList) + 1)]
     list = [pages.put(page) for page in pagesList]
     list = [saved.put(saveFile) for saveFile in savedList]
-    if (not dry_run): 
-        download(pages, saved, saveHTML)
+    if (not dry_run): download(pages, saved, saveHTML)
 
 def createHeaders():
     headers = { 
@@ -112,11 +103,18 @@ def removeEmpty(name):
     else:
         return False
 
+def createDict(title, keyword, itemList):
+    itemDict = dict.fromkeys(itemList, 1)
+    print(f"============ {title} ============")
+    [print(f"{keyword}: {item}") for item in itemDict]
+    print(f"")
+    return itemDict
+
 def getLinks(site, soup):
     exp = r"\"?(https://www.shapeways.com/product/\w{9}/)(\w*-*)*(\?optionId=\d{1,16})(.*user-profile)\"?"
     URLS = soup.find_all('a', href = re.compile(exp))
     linkList = list(map(lambda url: url['href'], URLS))
-    return pushOntoQueue("Links", "link", linkList, minis_links)
+    return createDict("Links", "link", linkList)
 
 def getNames(site, soup):
     exp = r"\"?(https://www.shapeways.com/product/\w{9}/)(\w*-*)*(\?optionId=\d{1,16})(.*user-profile)\"?"
@@ -128,12 +126,11 @@ def getIds(links, soup):
     exp = r"(\"?)(?<=https://www.shapeways.com/product/)(\w+)"
     regex = re.compile(exp)
     idsList = [regex.search(link).group(0) for link in links]
-    return pushOntoQueue("Ids", "ids", idsList, ids)
+    return createDict("Ids", "id", idsList)
 
-# def saveMini(directory):
 def saveMini():
     # mini = requests.get(downloadLinks.get(), allow_redirects=True, headers=createHeaders(), auth=(loadCredentials()))
-    print(f"Saving as: {mini_dir}/{names.get()}.zip")
+    print(f"Saving as: {mini_dir}/{names.get()}.zip", flush=True)
     # if (mini.status_code != 404):
         # print(f"Saving as: {mini_dir}/{names.get()}.zip")
         # writeToFile(mini.content, f"{mini_dir}/{names.get()}.zip", 'wb')
@@ -141,11 +138,7 @@ def saveMini():
 def downloadMini(mini_ids, directory = "miniatures"):
     if (not os.path.exists(directory)):
         os.makedirs(directory)
-    # Make ids, names, links all into lists
-    # Make downloadLinks a queue and push new links in here
-    # Multi-threaded download
     list = [downloadLinks.put(f'https://www.shapeways.com/product/download/{mini_id}') for mini_id in mini_ids]
     mini_dir = directory
-    # downloadAllMinis(directory)
     download(downloadLinks, names, saveMini)
     print(f"")
