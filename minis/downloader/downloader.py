@@ -136,7 +136,7 @@ def saveMini(directory):
     # if (mini.status_code != 404):
         # # writeToFile(mini.content, f"{directory}/{name}.zip", 'wb')
         # writeToFile(mini.content, f"{directory}/{names.get()}.zip", 'wb')
-        # # print(f"Saving as: {directory}/{names.get()}.zip")
+        print(f"Saving as: {directory}/{names.get()}.zip")
 
 def downloadAllMinis(directory):
     while (not downloadLinks.empty() and not names.empty()):
