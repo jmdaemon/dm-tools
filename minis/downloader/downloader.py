@@ -130,13 +130,10 @@ def getIds(links, soup):
     return pushOntoQueue("Ids", "ids", idsList, ids)
 
 def saveMini(directory):
-    # mini = requests.get(downloadLink, allow_redirects=True, headers=createHeaders(), auth=(loadCredentials()))
-
-    # mini = requests.get(downloadLinks.get(), allow_redirects=True, headers=createHeaders(), auth=(loadCredentials()))
-    # if (mini.status_code != 404):
-        # # writeToFile(mini.content, f"{directory}/{name}.zip", 'wb')
-        # writeToFile(mini.content, f"{directory}/{names.get()}.zip", 'wb')
+    mini = requests.get(downloadLinks.get(), allow_redirects=True, headers=createHeaders(), auth=(loadCredentials()))
+    if (mini.status_code != 404):
         print(f"Saving as: {directory}/{names.get()}.zip")
+        writeToFile(mini.content, f"{directory}/{names.get()}.zip", 'wb')
 
 def downloadAllMinis(directory):
     while (not downloadLinks.empty() and not names.empty()):
@@ -154,11 +151,3 @@ def downloadMini(mini_ids, directory = "miniatures"):
     # Multi-threaded download
     list = [downloadLinks.put(f'https://www.shapeways.com/product/download/{mini_id}') for mini_id in mini_ids]
     downloadAllMinis(directory)
-    # while(not downloadLinks.empty()):
-        # print(downloadLinks.get())
-
-    # while (not ids.empty() and not names.empty()):
-        # mini_id         = ids.get()
-        # name            = names.get()
-        # downloadLink    = (f'https://www.shapeways.com/product/download/{mini_id}')
-        # printMiniMetadata(mini_id, name, downloadLink)
