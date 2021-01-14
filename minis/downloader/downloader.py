@@ -70,22 +70,20 @@ def pushBackPage(currentPage, saveAs):
     pages.put(currentPage)
     saved.put(saveAs)
 
-def getHTMLPage(site, pageIndex, index, directory):
+def formatURLAndFile(site, pageIndex, index, directory):
     currentPage = (f'{site}?s={pageIndex}') 
     saveAs = (f'{directory}/mz4250-creations-page-{index}') 
     return currentPage, saveAs
 
-def getAllHTML(soup, directory, index = 1, pageIndex = 0):
+def getAllHTML(soup, directory, index = 1, offset = 0):
     end = getEnd(getPages(soup))
-    while (pageIndex < end):
-        currentPage, saveAs = getHTMLPage(site, pageIndex, index, directory)
+    while (offset < end):
+        currentPage, saveAs = formatURLAndFile(site, offset, index, directory)
         if (not os.path.exists(saveAs)):
-            pushBackPage(currentPage, saveAs, pages, saved)
+            pushBackPage(currentPage, saveAs)
         pageIndex += 48
         index += 1
-
-    currentPage, saveAs = getHTMLPage(site, end, index, directory)
-    pushBackPage(currentPage, saveAs, pages, saved)
+    pushBackPage(formatURLAndFile(site, end, index, directory))
     downloadHTML()
 
 def createHeaders():
@@ -150,7 +148,6 @@ def downloadMini():
     downloadLink    = (f'https://www.shapeways.com/product/download/{mini_id}')
     printMiniMetadata(mini_id, name, downloadLink)
 
-    session = requests.Session()
-    mini = session.get(downloadLink, allow_redirects=True, headers=createHeaders(), auth=(loadCredentials()))
+    mini = requests.get(downloadLink, allow_redirects=True, headers=createHeaders(), auth=(loadCredentials()))
     if (mini.status_code != 404):
         writeToFile(mini.content, f"{name}.zip", 'wb')
