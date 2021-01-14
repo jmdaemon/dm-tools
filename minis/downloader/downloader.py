@@ -110,22 +110,14 @@ def getEnd(tag):
     index = regexp.search(tag[5]['href'])
     return int(index.group(0))
 
-def pushOntoQueue(keyword, itemDict, itemQueue):
+def pushOntoQueue(title, keyword, itemList, itemQueue):
+    print(f"============ {title} ============")
+    itemDict = dict.fromkeys(itemList, 1)
     for item in itemDict:
         itemQueue.put(item)
         print(f"{keyword}: {item}")
     print(f"")
-
-def getLinks(site, soup):
-    exp = r"\"?(https://www.shapeways.com/product/\w{9}/)(\w*-*)*(\?optionId=\d{1,16})(.*user-profile)\"?"
-    URLS = soup.find_all('a', href = re.compile(exp))
-
-    print(f"============ Links ============")
-    linkList = list(map(lambda url: url['href'], URLS))
-
-    linkDict = dict.fromkeys(linkList, 1)
-    pushOntoQueue("link", linkDict, minis_links)
-    return linkDict
+    return itemDict
 
 def removeEmpty(name): 
     if(name): # if null
@@ -133,34 +125,23 @@ def removeEmpty(name):
     else:
         return False
 
+def getLinks(site, soup):
+    exp = r"\"?(https://www.shapeways.com/product/\w{9}/)(\w*-*)*(\?optionId=\d{1,16})(.*user-profile)\"?"
+    URLS = soup.find_all('a', href = re.compile(exp))
+    linkList = list(map(lambda url: url['href'], URLS))
+    return pushOntoQueue("Links", "link", linkList, minis_links)
+
 def getNames(site, soup):
     exp = r"\"?(https://www.shapeways.com/product/\w{9}/)(\w*-*)*(\?optionId=\d{1,16})(.*user-profile)\"?"
     results = soup.find_all('a', href = re.compile(exp))
-    print(f"============ Names ============")
     nameList = list(filter(removeEmpty, map(lambda name: name.get_text(strip=True), results)))
-    nameDict = dict.fromkeys(nameList, 1)
-    pushOntoQueue("name", nameDict, names)
-
-def sliceID(itemID, regex): 
-    return regex.search(itemID).group(0)
+    pushOntoQueue("Names", "name", nameList, names)
 
 def getIds(links, soup): 
     exp = r"(\"?)(?<=https://www.shapeways.com/product/)(\w+)"
     regex = re.compile(exp)
-    # idList = list(itemID for itemID in iter(links) if sliceID(itemID, regex))
-    # idList = map(sliceID(iter(links), regex), links)
-    idList = [regex.search(link).group(0) for link in links]
-
-    print(f"============ Ids ============")
-    idsDict = dict.fromkeys(idList, 1)
-    # pushOntoQueue("ids", idsDict, ids)
-    for itemID in idList:
-        print(f"itemID: {itemID}")
-    # pushOntoQueue("ids", idsDict, ids)
-    # for link in links:
-        # print(f"ids: {link}")
-        # ids.put(regex.search(link).group(0))
-    # print(f"")
+    idsList = [regex.search(link).group(0) for link in links]
+    pushOntoQueue("Ids", "ids", idsList, ids)
 
 def downloadMini():
     if (ids.empty() or names.empty() or minis_links.empty()):
