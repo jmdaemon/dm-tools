@@ -6,8 +6,6 @@ from requests.auth import HTTPBasicAuth
 import threading, queue
 import json
 
-# from .pages import *
-# from .filters import getEnd
 from .show_info import *
 
 # downloadAllMinis.py - Downloads .stl files of miniatures
@@ -20,22 +18,20 @@ from .show_info import *
 # 6. Create master index hash table.
 # 7. Look up each url, get the file, download and save as filename
 
-# Constants 
 site       = "https://www.shapeways.com/designer/mz4250/creations"
 HTML       = "./html"
+
+pages = queue.Queue()       # pages => HTML Pages
+saved = queue.Queue()       # saved => Save HTML Pages As [filename]
+
+minis_links = queue.Queue() # Links to Minis
+ids = queue.Queue()         # Product-ID
+names = queue.Queue()       # Mini Name
 
 def createSoup(fileName):
     with open(fileName, 'r') as f: 
         soup = BeautifulSoup(f, 'html.parser')
         return soup
-
-
-pages = queue.Queue() # pages => HTML Pages
-saved = queue.Queue() # saved => Save HTML Pages As [filename]
-
-minis_links = queue.Queue() # Links to Minis
-ids = queue.Queue()         # Product-ID
-names = queue.Queue()       # Mini Name
 
 def createDir(path):
     try:
@@ -48,7 +44,6 @@ def createDir(path):
 def writeToFile(html, fileName):
     with open(fileName, 'w') as f:
         f.write(html)
-
 
 def saveHTML():
     html = requests.get(pages.get()).text
@@ -120,10 +115,7 @@ def getLinks(site, soup):
     URLS = soup.find_all('a', href = re.compile(exp))
 
     print(f"============ Links ============")
-    linkList = []
-    for url in URLS:
-        link = url['href']
-        linkList.append(link)
+    linkList = list(map(lambda url: url['href'], URLS))
 
     linkDict = dict.fromkeys(linkList, 1)
     for link in linkDict: 
@@ -141,13 +133,10 @@ def getNames(site, soup):
         name = result.get_text(strip=True)
         if (not name):
             continue
-        # print(f"name: {name}")
-        # names.put(result.get_text())
         nameList.append(name)
 
     nameDict = dict.fromkeys(nameList, 1)
     for name in nameDict: 
-        # minis_links.put(link)
         names.put(name)
         print(f"name: {name}")
     print(f"")
@@ -176,5 +165,5 @@ def downloadMini():
     session = requests.Session()
     mini = session.get(downloadLink, allow_redirects=True, headers=createHeaders(), auth=(loadCredentials()))
     if (mini.status_code != 404):
-        with open('test.zip', 'wb') as f:
+        with open(f"{name}.zip", 'wb') as f:
             f.write(mini.content)
