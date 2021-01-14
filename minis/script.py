@@ -20,7 +20,7 @@ site = "https://www.shapeways.com/designer/mz4250/creations"
 
 def downloadHTMLIndices():
     # downloader.getAllHTML(soup, "./html")
-    downloader.getAllHTML(soup, "./null")
+    downloader.getAllHTML(soup, "./null", dry_run=True)
 
 def downloadAllMinis():
     links = downloader.getLinks(site, soup)

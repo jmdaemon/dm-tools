@@ -65,10 +65,6 @@ def getPages(soup):
     pages = soup.find_all('a', href = re.compile(regexp))
     return pages
 
-def pushBackPage(currentPage, saveAs):
-    pages.put(currentPage)
-    saved.put(saveAs)
-
 def formatURLAndFile(site, pageIndex, index, directory):
     currentPage = (f'{site}?s={pageIndex}') 
     saveAs = (f'{directory}/mz4250-creations-page-{index}') 
@@ -83,50 +79,21 @@ def genPageOffsets(offset, end):
 
 def genSaveOffsets(pageOffsets, index):
     for page in pageOffsets:
-        # print(page)
         yield index
         index += 1
 
-def formatURL(site, pageOffset):
-    return (f'{site}?s={pageIndex}') 
-
-def getAllHTML(soup, directory = "./html", index = 1, offset = 0):
+def getAllHTML(soup, directory = "./html", index = 1, offset = 0, dry_run = False):
     if (os.path.exists(directory)):
         print(f"Directory {directory} already exists.")
         return
-    end = getEnd(getPages(soup))
-    # pages = []
-    # pages = genPageOffsets(offset, end)
-    pageOffsets = genPageOffsets(offset, end) 
-    savedOffsets = genSaveOffsets(pageOffsets, index)
-    # for saved in savedOffsets:
-        # print(saved)
-        
-    # pagesList = [f'{site}?s={offset}' for offset in pageOffsets]
-    savedList = [f'{directory}/mz4250-creations-page-{index}' for index in savedOffsets]
-    # savedList = [f'{directory}/mz4250-creations-page-{index}' for index in genSaveOffsets(pageOffsets, index)]
-    # for page in pagesList:
-        # print(page)
-    for saved in savedList:
-        print(saved)
-    # savedList =
-        
-    # while (offset < end):
-        # pages.append(f'{site}?s={offset}')
-        # offset += 48
-    # while (offset < end):
-        # currentPage = (f'{site}?s={pageIndex}') 
-        # saveAs = (f'{directory}/mz4250-creations-page-{index}') 
-    # pageOffsets = [offset += 48 if offset < end else end]
-    while (offset < end):
-        currentPage, saveAs = formatURLAndFile(site, offset, index, directory)
-        if (not os.path.exists(saveAs)):
-            pushBackPage(currentPage, saveAs)
-        # pageIndex += 48
-        offset += 48
-        index += 1
-    pushBackPage(*formatURLAndFile(site, end, index, directory))
-    # downloadHTML()
+    end = getEnd(getPages(soup)) 
+    pagesList = [f'{site}?s={offset}' for offset in genPageOffsets(offset, end)]
+    savedList = [f'{directory}/mz4250-creations-page-{index}' for index in genSaveOffsets(pagesList, index)]
+
+    list = [pages.put(page) for page in pagesList]
+    list = [saved.put(saveFile) for saveFile in savedList]
+    if (not dry_run):
+        downloadHTML()
 
 def createHeaders():
     headers = { 
