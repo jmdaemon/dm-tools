@@ -37,6 +37,19 @@ minis_links = queue.Queue() # Links to Minis
 ids = queue.Queue()         # Product-ID
 names = queue.Queue()       # Mini Name
 
+def createDir(path):
+    try:
+        os.mkdir(path)
+    except OSError:
+        print ("Creation of the directory %s failed" % path)
+    else:
+        print ("Successfully created the directory %s " % path)
+
+def writeToFile(html, fileName):
+    with open(fileName, 'w') as f:
+        f.write(html)
+
+
 def saveHTML():
     html = requests.get(pages.get()).text
     writeToFile(html, saved.get())
@@ -54,7 +67,7 @@ def downloadHTML():
                     thread.join()
 
 def getPages(soup):
-    regexp = "(\/designer\/mz4250\/creations\?s=\d{0,4}#more-products)"
+    regexp = r"(/designer/mz4250/creations\?s=\d{0,4}#more-products)"
     pages = soup.find_all('a', href = re.compile(regexp))
     return pages
 
@@ -97,13 +110,14 @@ def loadCredentials(creds_file = 'creds.json'):
     return data['username'], data['password']
 
 def getEnd(tag):
-    exp = "(?<=\/designer\/mz4250\/creations\?s=)(\d{1,4})(?=#more-products)"
+    exp = r"(?<=/designer/mz4250/creations\?s=)(\d{1,4})(?=#more-products)"
     regexp = re.compile(exp)
     index = regexp.search(tag[5]['href'])
     return int(index.group(0))
 
+
+
 def getLinks(site, soup):
-# def getLinks(site, soup):
     exp = r"\"?(https:\/\/www\.shapeways.com\/product\/\w{9}\/)(\w*\-*)*(\?optionId=\d{1,16})(.*user-profile)\"?"
     URLS = soup.find_all('a', href = re.compile(exp))
 
@@ -124,48 +138,21 @@ def getIds(links, soup):
     regex = re.compile(exp)
 
     for link in links:
-        match = regex.search(link)
-        ids.put(match.group(0))
-
+        ids.put(regex.search(link).group(0))
 
 def downloadMini():
     if (ids.empty() or names.empty() or minis_links.empty()):
         print(f"No miniatures to download...")
         return
 
+    # while (not ids.empty() and not names.empty()):
     mini_id         = ids.get()
     name            = names.get()
     downloadLink    = (f'https://www.shapeways.com/product/download/{mini_id}')
+    printMiniMetadata(mini_id, name, downloadLink)
 
     session = requests.Session()
-    headers = createHeaders()
-
-    print(loadCredentials())
-
-
-    # print(data['username'] + " " + data['password'])
-
-    # mini = session.get(downloadLink, allow_redirects=True, headers=headers, auth=(data['username'], data['password']))
-    # if (mini.status_code != 404):
-        # print(mini.text)
-        # with open('test.zip', 'wb') as f:
-            # f.write(mini.content)
-
-    # print (mini.headers)
-    # print (mini.request.headers)
-
-# path = "./html"
-# site = "https://www.shapeways.com/designer/mz4250/creations"
-
-# writeToFile(getHTMLPage(site), path + "/mz4250-creations-page-1")
-# getAllHTML(end)
-
-# end = getEnd(getPages(createSoup("creations.html")))
-# getAllHTML(end, site, "./html")
-# soup = createSoup("creations.html")
-# soup = createSoup("./html/mz4250-creations-page-1")
-
-# links = getLinks(site, soup)
-# getNames(site, soup)
-# getIds(links, soup)
-# downloadMini(soup)
+    mini = session.get(downloadLink, allow_redirects=True, headers=createHeaders(), auth=(loadCredentials()))
+    if (mini.status_code != 404):
+        with open('test.zip', 'wb') as f:
+            f.write(mini.content)

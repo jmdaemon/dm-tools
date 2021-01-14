@@ -29,4 +29,4 @@ def downloadAllMinis():
     downloader.downloadMini()
 # def createMasterIndex():
 
-downloadAllMinis()
+# downloadAllMinis()
