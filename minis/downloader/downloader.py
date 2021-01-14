@@ -141,15 +141,26 @@ def getNames(site, soup):
     nameDict = dict.fromkeys(nameList, 1)
     pushOntoQueue("name", nameDict, names)
 
+def sliceID(itemID, regex): 
+    return regex.search(itemID).group(0)
+
 def getIds(links, soup): 
     exp = r"(\"?)(?<=https://www.shapeways.com/product/)(\w+)"
     regex = re.compile(exp)
+    # idList = list(itemID for itemID in iter(links) if sliceID(itemID, regex))
+    # idList = map(sliceID(iter(links), regex), links)
+    idList = [regex.search(link).group(0) for link in links]
 
     print(f"============ Ids ============")
-    for link in links:
-        print(f"ids: {link}")
-        ids.put(regex.search(link).group(0))
-    print(f"")
+    idsDict = dict.fromkeys(idList, 1)
+    # pushOntoQueue("ids", idsDict, ids)
+    for itemID in idList:
+        print(f"itemID: {itemID}")
+    # pushOntoQueue("ids", idsDict, ids)
+    # for link in links:
+        # print(f"ids: {link}")
+        # ids.put(regex.search(link).group(0))
+    # print(f"")
 
 def downloadMini():
     if (ids.empty() or names.empty() or minis_links.empty()):
