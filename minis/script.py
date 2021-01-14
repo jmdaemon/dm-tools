@@ -26,7 +26,7 @@ def downloadAllMinis():
     links = downloader.getLinks(site, soup)
     downloader.getIds(links, soup)
     downloader.getNames(site, soup)
-    downloader.downloadMini()
+    # downloader.downloadMini()
 # def createMasterIndex():
 
-# downloadAllMinis()
+downloadAllMinis()

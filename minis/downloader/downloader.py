@@ -115,30 +115,71 @@ def getEnd(tag):
     index = regexp.search(tag[5]['href'])
     return int(index.group(0))
 
-
-
 def getLinks(site, soup):
-    exp = r"\"?(https:\/\/www\.shapeways.com\/product\/\w{9}\/)(\w*\-*)*(\?optionId=\d{1,16})(.*user-profile)\"?"
-    URLS = soup.find_all('a', href = re.compile(exp))
+    # exp = r"\"?(https:\/\/www\.shapeways.com\/product\/\w{9}\/)(\w*\-*)*(\?optionId=\d{1,16})(.*user-profile)\"?"
+    exp = r"\"?(https://www.shapeways.com/product/\w{9}/)(\w*-*)*(\?optionId=\d{1,16})(.*user-profile)\"?"
+    # URLS = soup.find_all('a', href = re.compile(exp))
+    # URL_SET = soup.find_all('a', href = re.compile(exp))
+    # newSoup = BeautifulSoup(URL_SET[0], 'html.parser')
+    # LinkSet = soup.find_all('a', 'data-sw-target-tracking-entity_id', href = re.compile(exp))
+    LinkSet = soup.find_all('a', href = re.compile(exp))
 
-    links = set()
-    for url in URLS:
+    print(f"============ Links ============")
+    # for url in newSoup.find_all('a', href=True):
+        # print("url href:{a['href']}")
+
+
+    # links = set(LinkSet[0])
+    # links = set(LinkSet)
+    # links = set("")
+    # for url in URLS:
+    linkList = []
+    for url in LinkSet:
         link = url['href']
-        links.add(link)
+        # links.add(link)
+        linkList.append(link)
+        # print(f"link: {link}")
         minis_links.put(link)
-    return links
+
+    print(f"linkList: ")
+    linkList = dict.fromkeys(linkList, 1)
+    # dict.fromkeys(link in linkList)
+
+    for link in linkList: 
+        print(f"link: {link}")
+
+    # print(f"linkSet: ")
+    # linkSet = set(linkList)
+    # for link in linkSet:
+        # print(f"link: {link}")
+
+    # print(f"links: {links}")
+    print(f"")
+    return linkList
+    # return links
 
 def getNames(site, soup):
-    results = soup.find_all('a', 'product-url', text=True)
+    exp = r"\"?(https://www.shapeways.com/product/\w{9}/)(\w*-*)*(\?optionId=\d{1,16})(.*user-profile)\"?"
+    # results = soup.find_all('a', 'product-url', text=True)
+    results = soup.find_all('a', href = re.compile(exp))
+    print(f"============ Names ============")
     for result in results:
+        name = result.get_text()
+        # name = result['text']
+        # print(f"name: {result}")
+        print(f"name: {name}")
         names.put(result.get_text())
+    print(f"")
 
 def getIds(links, soup): 
-    exp = r"(\"?)(?<=https:\/\/www\.shapeways\.com\/product\/)(\w+)"
+    exp = r"(\"?)(?<=https://www.shapeways.com/product/)(\w+)"
     regex = re.compile(exp)
 
+    print(f"============ Ids ============")
     for link in links:
+        print(f"ids: {link}")
         ids.put(regex.search(link).group(0))
+    print(f"")
 
 def downloadMini():
     if (ids.empty() or names.empty() or minis_links.empty()):
