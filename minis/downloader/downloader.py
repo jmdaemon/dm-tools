@@ -45,9 +45,8 @@ def writeToFile(content, fileName, modes = 'w'):
         f.write(content)
 
 def saveHTML():
-    # html = requests.get(pages.get()).text
-    # writeToFile(html, saved.get())
-    printQueues(pages, saved)
+    html = requests.get(pages.get()).text
+    writeToFile(html, saved.get())
 
 def downloadHTML():
     while (not pages.empty() and not saved.empty()):
@@ -69,17 +68,12 @@ def genPageOffsets(offset, end):
     yield end
     return 
 
-def genSaveOffsets(pageOffsets, index):
-    for page in pageOffsets:
-        yield index
-        index += 1
-
 def getAllHTML(soup, directory = "./html", index = 1, offset = 0, dry_run = False):
     if (os.path.exists(directory)):
         print(f"Directory {directory} already exists.")
         return
     pagesList = [f'{site}?s={offset}' for offset in genPageOffsets(offset, getEnd(getPages(soup)))]
-    savedList = [f'{directory}/mz4250-creations-page-{index}' for index in genSaveOffsets(pagesList, index)]
+    savedList = [f'{directory}/mz4250-creations-page-{index}' for index in range(index, len(pagesList) + 1)]
     list = [pages.put(page) for page in pagesList]
     list = [saved.put(saveFile) for saveFile in savedList]
     if (not dry_run):
