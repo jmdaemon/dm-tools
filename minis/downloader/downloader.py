@@ -89,11 +89,8 @@ def getEnd(tag):
     return int(index.group(0))
 
 def pushOntoQueue(title, keyword, itemList, itemQueue):
-    # list = [itemQueue.put(item) for item in createDict(title, keyword, itemList)]
     itemDict = createDict(title, keyword, itemList)
-    # result = [itemQueue.put(item) for item in createDict(title, keyword, itemList)]
     result = [itemQueue.put(item) for item in itemDict]
-    # return result
     return itemDict
 
 def removeEmpty(name): 
@@ -143,9 +140,7 @@ def downloadMini(mini_ids, directory = "miniatures"):
     print(f"")
 
 def getMiniMetadata():
-    print(f"mini_saved  : {mini_saved.get()}", flush=True)
-    print(f"mini_link   : {mini_links.get()}", flush=True)
-    print(f"", flush=True)
+    printProductMetadata(mini_saved, mini_links)
     # html = requests.get(links.get()).text
     # writeToFile(html, names.get())
 
@@ -155,17 +150,11 @@ def getProductHTML(soup, links, mini_names, directory = "./html/products", index
         return
     elif (not os.path.exists(directory)):
         os.makedirs(directory)
-    # minis_savedList = [f"{directory}/{name}-product-page" for name in names.get()]
-    # minis_savedList = [f"{directory}/{name}" for name in names.get()]
-    # print(names.get())
-    # minis_savedList = [f"{directory}/{name}" for name in iter(mini_names)]
-    # minis_savedList = [f"{directory}/{name}" for name in mini_names.items()]
     # minis_savedList = [f"{directory}/page-{index}/{name}".replace(" ", "-") for name in mini_names]
     minis_savedList = [f"{directory}/{name}".replace(" ", "-") for name in mini_names]
     list = [mini_saved.put(mini_savedData) for mini_savedData in minis_savedList]
     list = [mini_links.put(mini_link) for mini_link in links]
     print(f"============ Mini Metadata ============")
-    # if (not dry_run): download(mini_links, mini_saved, getMiniMetadata) 
-    # print(mini_saved)
-    download(mini_links, mini_saved, getMiniMetadata)
+    if (not dry_run): download(mini_links, mini_saved, getMiniMetadata) 
+    os.rmdir(directory)
     print(f"")
