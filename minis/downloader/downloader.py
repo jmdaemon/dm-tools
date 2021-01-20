@@ -144,14 +144,18 @@ def getMiniMetadata():
     # html = requests.get(links.get()).text
     # writeToFile(html, names.get())
 
-def getProductHTML(soup, links, mini_names, directory = "./html/products", index = 1, offset = 0, dry_run = False):
+# def getProductHTML(soup, links, mini_names, directory = "./html/products", index = 1, offset = 0, dry_run = False):
+def getProductHTML(soup, links, directory = "./html/products", index = 1, offset = 0, dry_run = False):
     if(os.path.exists(directory)):
         print(f"Directory {directory} already exists.")
         return
     elif (not os.path.exists(directory)):
         os.makedirs(directory)
     # minis_savedList = [f"{directory}/page-{index}/{name}".replace(" ", "-") for name in mini_names]
-    minis_savedList = [f"{directory}/{name}".replace(" ", "-") for name in mini_names]
+    # print(names.queue)
+    # mini_names = [name for name in names.queue]
+    # minis_savedList = [f"{directory}/{name}".replace(" ", "-") for name in mini_names]
+    minis_savedList = [f"{directory}/{name}".replace(" ", "-") for name in names.queue]
     list = [mini_saved.put(mini_savedData) for mini_savedData in minis_savedList]
     list = [mini_links.put(mini_link) for mini_link in links]
     print(f"============ Mini Metadata ============")

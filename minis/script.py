@@ -39,7 +39,8 @@ def downloadAllMiniMetadata():
     links = downloader.getLinks(site, soup)
     minis_ids = downloader.getIds(links, soup)
     mini_names = downloader.getNames(site, soup)
-    downloader.getProductHTML(soup, links, mini_names,dry_run=False)
+    # downloader.getProductHTML(soup, links, mini_names,dry_run=False)
+    downloader.getProductHTML(soup, links, dry_run=False)
 
 # downloadHTMLIndices()
 # downloadAllMinis()
