@@ -16,7 +16,9 @@ mini_dir    = "miniatures"
 pages = queue.Queue()       # pages => HTML Pages
 saved = queue.Queue()       # saved => Save HTML Pages As [filename]
 
-names = queue.Queue()       # Mini Name
+mini_links = queue.Queue()
+mini_saved = queue.Queue()
+names = queue.Queue()
 downloadLinks = queue.Queue()
 
 def createSoup(fileName):
@@ -87,7 +89,12 @@ def getEnd(tag):
     return int(index.group(0))
 
 def pushOntoQueue(title, keyword, itemList, itemQueue):
-    list = [itemQueue.put(item) for item in createDict(title, keyword, itemList)]
+    # list = [itemQueue.put(item) for item in createDict(title, keyword, itemList)]
+    itemDict = createDict(title, keyword, itemList)
+    # result = [itemQueue.put(item) for item in createDict(title, keyword, itemList)]
+    result = [itemQueue.put(item) for item in itemDict]
+    # return result
+    return itemDict
 
 def removeEmpty(name): 
     if(name): # if null
@@ -106,12 +113,13 @@ def getLinks(site, soup):
     URLS = soup.find_all('a', href = re.compile(exp))
     linkList = list(map(lambda url: url['href'], URLS))
     return createDict("Links", "link", linkList)
+    # return pushOntoQueue("Links", "link", linkList, links)
 
 def getNames(site, soup):
     exp = r"\"?(https://www.shapeways.com/product/\w{9}/)(\w*-*)*(\?optionId=\d{1,16})(.*user-profile)\"?"
     results = soup.find_all('a', href = re.compile(exp))
     nameList = list(filter(removeEmpty, map(lambda name: name.get_text(strip=True), results)))
-    pushOntoQueue("Names", "name", nameList, names)
+    return pushOntoQueue("Names", "name", nameList, names)
 
 def getIds(links, soup): 
     exp = r"(\"?)(?<=https://www.shapeways.com/product/)(\w+)"
@@ -132,4 +140,32 @@ def downloadMini(mini_ids, directory = "miniatures"):
         mini_dir = directory
     list = [downloadLinks.put(f'https://www.shapeways.com/product/download/{mini_id}') for mini_id in mini_ids]
     download(downloadLinks, names, saveMini)
+    print(f"")
+
+def getMiniMetadata():
+    print(f"mini_saved  : {mini_saved.get()}", flush=True)
+    print(f"mini_link   : {mini_links.get()}", flush=True)
+    print(f"", flush=True)
+    # html = requests.get(links.get()).text
+    # writeToFile(html, names.get())
+
+def getProductHTML(soup, links, mini_names, directory = "./html/products", index = 1, offset = 0, dry_run = False):
+    if(os.path.exists(directory)):
+        print(f"Directory {directory} already exists.")
+        return
+    elif (not os.path.exists(directory)):
+        os.makedirs(directory)
+    # minis_savedList = [f"{directory}/{name}-product-page" for name in names.get()]
+    # minis_savedList = [f"{directory}/{name}" for name in names.get()]
+    # print(names.get())
+    # minis_savedList = [f"{directory}/{name}" for name in iter(mini_names)]
+    # minis_savedList = [f"{directory}/{name}" for name in mini_names.items()]
+    # minis_savedList = [f"{directory}/page-{index}/{name}".replace(" ", "-") for name in mini_names]
+    minis_savedList = [f"{directory}/{name}".replace(" ", "-") for name in mini_names]
+    list = [mini_saved.put(mini_savedData) for mini_savedData in minis_savedList]
+    list = [mini_links.put(mini_link) for mini_link in links]
+    print(f"============ Mini Metadata ============")
+    # if (not dry_run): download(mini_links, mini_saved, getMiniMetadata) 
+    # print(mini_saved)
+    download(mini_links, mini_saved, getMiniMetadata)
     print(f"")
