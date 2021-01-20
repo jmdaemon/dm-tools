@@ -89,28 +89,25 @@ def getEnd(tag):
     index = regexp.search(tag[5]['href'])
     return int(index.group(0))
 
-def pushOntoQueue(title, keyword, itemList, itemQueue):
-    itemDict = createDict(title, keyword, itemList)
-    result = [itemQueue.put(item) for item in itemDict]
-    return itemDict
-
-def removeEmpty(name): 
-    if(name): # if null
-        return True
-    else:
-        return False
-
 def createDict(title, keyword, itemList):
     itemDict = dict.fromkeys(itemList, 1)
     print(f"============ {title} ============")
     list = [print(f"{keyword}: {item}") for item in itemDict] + [print(f"")]
     return itemDict
 
+def pushOntoQueue(title, keyword, itemList, itemQueue):
+    list = [itemQueue.put(item) for item in createDict(title, keyword, itemList)]
+
+def removeEmpty(name): 
+    if(name): # if null
+        return True
+    else:
+        return False 
+
 def getLinks(site, soup):
     exp = r"\"?(https://www.shapeways.com/product/\w{9}/)(\w*-*)*(\?optionId=\d{1,16})(.*user-profile)\"?"
     URLS = soup.find_all('a', href = re.compile(exp))
     linkList = list(map(lambda url: url['href'], URLS))
-    # return createDict("Links", "link", linkList)
     pushOntoQueue("Links", "link", linkList, links)
 
 def getNames(site, soup):
@@ -118,9 +115,7 @@ def getNames(site, soup):
     results = soup.find_all('a', href = re.compile(exp))
     nameList = list(filter(removeEmpty, map(lambda name: name.get_text(strip=True), results)))
     pushOntoQueue("Names", "name", nameList, names)
-    # return pushOntoQueue("Names", "name", nameList, names)
 
-# def getIds(links, soup): 
 def getIds(soup): 
     exp = r"(\"?)(?<=https://www.shapeways.com/product/)(\w+)"
     regex = re.compile(exp)
