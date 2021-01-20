@@ -117,14 +117,15 @@ def getNames(site, soup):
     exp = r"\"?(https://www.shapeways.com/product/\w{9}/)(\w*-*)*(\?optionId=\d{1,16})(.*user-profile)\"?"
     results = soup.find_all('a', href = re.compile(exp))
     nameList = list(filter(removeEmpty, map(lambda name: name.get_text(strip=True), results)))
-    return pushOntoQueue("Names", "name", nameList, names)
+    pushOntoQueue("Names", "name", nameList, names)
+    # return pushOntoQueue("Names", "name", nameList, names)
 
 # def getIds(links, soup): 
 def getIds(soup): 
     exp = r"(\"?)(?<=https://www.shapeways.com/product/)(\w+)"
     regex = re.compile(exp)
     idsList = [regex.search(link).group(0) for link in links.queue]
-    return createDict("Ids", "id", idsList)
+    createDict("Ids", "id", idsList)
 
 def saveMini():
     # mini = requests.get(downloadLinks.get(), allow_redirects=True, headers=createHeaders(), auth=(loadCredentials()))
