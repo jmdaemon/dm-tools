@@ -1,6 +1,6 @@
 #/usr/bin/python3.9
 
-import downloader
+from downloader import *
 
 # 1. Setup Class
 # Set 
@@ -36,15 +36,11 @@ def createMasterIndex():
     downloader.createIndex()
 
 def downloadAllMiniMetadata():
-    # links = downloader.getLinks(site, soup)
-    downloader.getLinks(site, soup)
-    # minis_ids = downloader.getIds(links, soup)
-    downloader.getIds(soup)
-    # mini_names = downloader.getNames(site, soup)
-    downloader.getNames(site, soup)
-    # downloader.getProductHTML(soup, links, mini_names,dry_run=False)
-    # downloader.getProductHTML(soup, links, dry_run=False)
-    downloader.getProductHTML(soup, dry_run=False)
+    linksList = getLinks(site, soup)
+    idsList = getIds(soup)
+    namesList = getNames(site, soup)
+    populateQueue(linksList, namesList, idsList)
+    getProductHTML(soup, dry_run=False)
 
 # downloadHTMLIndices()
 # downloadAllMinis()
