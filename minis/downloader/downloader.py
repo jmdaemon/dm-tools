@@ -14,23 +14,15 @@ from .extract import *
 site        = "https://www.shapeways.com/designer/mz4250/creations"
 mini_dir    = "miniatures"
 
-pages = queue.Queue()       # pages => HTML Pages
-saved = queue.Queue()       # saved => Save HTML Pages As [filename]
-
-# links = queue.Queue()
-# names = queue.Queue()
-# ids = queue.Queue()
 mini_links = queue.Queue()
 mini_saved = queue.Queue()
 downloadLinks = queue.Queue()
 
-# BeautifulSoup
 def createSoup(fileName):
     with open(fileName, 'r') as f: 
         soup = BeautifulSoup(f, 'html.parser')
         return soup
 
-# File Utils
 def createDir(path):
     try:
         os.mkdir(path)
@@ -48,15 +40,7 @@ def saveHTML(pages, saved):
     # html = requests.get(pages.get()).text
     # writeToFile(html, saved.get())
 
-def download(firstQueue, secondQueue, target):
-    while (not firstQueue.empty() and not secondQueue.empty()):
-        if (threading.active_count() <= 4): worker = threading.Thread(target=target).start() 
-        else:
-            list = [thread.join for thread in threading.enumerate() if thread is not threading.main_thread()]
-
-# def downloadWithArgs(firstQueue, secondQueue, target, args):
-    # while (not firstQueue.empty() and not secondQueue.empty()):
-def downloadWithArgs(target, args):
+def download(target, args):
     if (threading.active_count() <= 4): worker = threading.Thread(target=target, args=args).start() 
     else:
         list = [thread.join for thread in threading.enumerate() if thread is not threading.main_thread()]
@@ -66,6 +50,11 @@ def getPages(soup):
     pages = soup.find_all('a', href = re.compile(regexp))
     return pages
 
+def listToQueue(itemList):
+    itemQueue = queue.Queue()
+    list = [itemQueue.put(item) for item in itemList]
+    return itemQueue
+
 def getAllHTML(soup, directory = "./html", index = 1, offset = 0, dry_run = False):
     if(os.path.exists(directory)):
         print(f"Directory {directory} already exists.")
@@ -74,15 +63,11 @@ def getAllHTML(soup, directory = "./html", index = 1, offset = 0, dry_run = Fals
         os.makedirs(directory)
     end = getEnd(getPages(soup))
     pagesList = [f'{site}?s={offset}' for offset in ([*range(offset, end, 48)] + [end])]
-    savedList = [f'{directory}/mz4250-creations-page-{index}' for index in range(index, len(pagesList) + 1)]
-    pages = queue.Queue()
-    saved = queue.Queue()
-    list = [pages.put(page) for page in pagesList]
-    list = [saved.put(saveFile) for saveFile in savedList]
-    # if (not dry_run): download(pages, saved, saveHTML)
+    pages = listToQueue(pagesList)
+    saved = listToQueue([f'{directory}/mz4250-creations-page-{index}' for index in range(index, len(pagesList) + 1)])
     if (not dry_run):
         while (not pages.empty() and not saved.empty()):
-            downloadWithArgs(saveHTML, args=(pages, saved)) 
+            download(saveHTML, args=(pages, saved)) 
 
 def createHeaders():
     headers = { 
@@ -135,13 +120,10 @@ def getProductHTML(soup, metadata, directory = "./html/products", index = 1, off
         return
     elif (not os.path.exists(directory)):
         os.makedirs(directory)
-    # minis_savedList = [f"{directory}/page-{index}/{name}".replace(" ", "-") for name in mini_names]
-    minis_savedList = [f"{directory}/{name}".replace(" ", "-") for name in metadata.names.queue]
-    SavedQueue = queue.Queue() 
-    list = [SavedQueue.put(mini_savedData) for mini_savedData in minis_savedList]
+    SavedQueue = listToQueue([f"{directory}/{name}".replace(" ", "-") for name in metadata.names.queue])
     print(f"============ Mini Metadata ============")
     if (not dry_run): 
         while (not metadata.links.empty() and not SavedQueue.empty()):
-            downloadWithArgs(printMetadata, args=(metadata.links, SavedQueue)) 
+            download(printMetadata, args=(metadata.links, SavedQueue)) 
     os.rmdir(directory)
     print(f"")
