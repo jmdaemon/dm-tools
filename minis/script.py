@@ -25,10 +25,15 @@ def downloadHTMLIndices():
     downloader.getAllHTML(soup, "./null")
 
 def downloadAllMinis():
-    links = downloader.getLinks(site, soup)
-    minis_ids = downloader.getIds(links, soup)
-    downloader.getNames(site, soup)
-    downloader.downloadMini(minis_ids)
+    # links = downloader.getLinks(site, soup)
+    # minis_ids = downloader.getIds(links, soup)
+    # downloader.getNames(site, soup)
+    # downloader.downloadMini(minis_ids)
+    linksList   = extractMiniatureLinks(site, soup)
+    namesList   = extractMiniatureNames(site, soup)
+    idsList     = extractMiniatureProductIds(soup, linksList)
+    metadata = Metadata(linksList, namesList, idsList)
+    downloader.downloadMini(metadata)
 
 def createMasterIndex():
     links = downloader.getLinks(site, soup)
@@ -45,6 +50,6 @@ def downloadAllMiniMetadata():
     getProductHTML(soup, metadata, dry_run=False)
 
 # downloadHTMLIndices()
-# downloadAllMinis()
+downloadAllMinis()
 # createMasterIndex()
-downloadAllMiniMetadata()
+# downloadAllMiniMetadata()

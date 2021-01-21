@@ -33,9 +33,10 @@ def createDir(path):
 
 def dirExists(directory):
     if(os.path.exists(directory)):
-        print(f"{directory} already exists.")
-        return
-    createDir(directory)
+        print(f"\"{directory}\" already exists.")
+        return True
+    else:
+        createDir(directory)
 
 def writeToFile(content, fileName, modes = 'w'):
     with open(fileName, modes) as f:
@@ -93,20 +94,23 @@ def getEnd(tag):
     index = regexp.search(tag[5]['href'])
     return int(index.group(0))
 
-def saveMini():
+def saveMini(directory, downloadLinks, names):
     # mini = requests.get(downloadLinks.get(), allow_redirects=True, headers=createHeaders(), auth=(loadCredentials()))
-    print(f"Saving as: {mini_dir}/{names.get()}.zip", flush=True)
+    # print(f"Saving as: {mini_dir}/{names.get()}.zip", flush=True)
+    print(f"Saving as: {directory}/{names.get()}.zip", flush=True)
     # if (mini.status_code != 404):
         # print(f"Saving as: {mini_dir}/{names.get()}.zip")
         # writeToFile(mini.content, f"{mini_dir}/{names.get()}.zip", 'wb')
 
-def downloadMini(mini_ids, directory = "miniatures"):
-    if 
-    if (not os.path.exists(directory)):
-        os.makedirs(directory)
-        mini_dir = directory
-    list = [downloadLinks.put(f'https://www.shapeways.com/product/download/{mini_id}') for mini_id in mini_ids]
-    download(downloadLinks, names, saveMini)
+# def downloadMini(mini_ids, directory = "miniatures"):
+def downloadMini(metadata, directory = "miniatures"):
+    if (dirExists(directory)): 
+        return
+    mini_dir = directory
+    list = [downloadLinks.put(f'https://www.shapeways.com/product/download/{mini_id}') for mini_id in metadata.ids.queue]
+    # download(downloadLinks, names, saveMini)
+    while (not downloadLinks.empty() and not metadata.names.empty()):
+        download(saveMini, args=(directory, downloadLinks, metadata.names)) 
     print(f"")
 
 def printMetadata(LinksQueue, SavedQueue):
