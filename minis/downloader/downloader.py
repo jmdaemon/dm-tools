@@ -80,13 +80,46 @@ def downloadMiniature(metadata, directory = "miniatures"):
         download(retrieveMiniature, args=(directory, downloadLinks, metadata.links, metadata.names)) 
     print(f"")
 
-def printMetadata(LinksQueue, SavedQueue):
+def downloadMetadata(LinksQueue, SavedQueue):
+    # writeToFile(requests.get(LinksQueue.get()).text, SavedQueue.get())
     printProductMetadata(SavedQueue, LinksQueue)
+
+def replace_all(text, dic):
+    for i, j in dic.items():
+        text = text.replace(i, j)
+    return text
+
+def escapeSpecialChars(directory, name):
+    # escapeBackslash = name.replace("/", "ith")
+    # escapeWhiteSpace = escapeBackslash.replace(" ", "-")
+    # f"{directory}/{escapeWhiteSpace}"
+    # name.replace(" ", "-")
+    # name.replace(" ", "")
+    # name.replace("/", "ith")
+    nameAsString = str(name)
+    specialCharacters = {" ": "-", "/": "ith-"}
+    # replace_all(nameAsString, specialCharacters)
+    # result = f"{directory}/{name}"
+    result = f"{directory}/{replace_all(nameAsString, specialCharacters)}"
+    return result
 
 def getProductHTML(soup, metadata, directory = "./html/products", index = 1, offset = 0, dry_run = False):
     if(dirExists(directory)): return
-    SavedQueue = listToQueue([f"{directory}/{name}".replace(" ", "-") for name in metadata.names.queue])
+    # backslash = "/"
+    # escapeKey = "ith" 
+    # SavedQueue = listToQueue([f"{directory}/{name.replace({backslash}, str({escapeKey}))}".replace(" ", "-") for name in metadata.names.queue])
+    # SavedQueue = listToQueue([(name.replace("/", "ith")) f"{directory}/{name}".replace(" ", "-") for name in metadata.names.queue])
+    # SavedQueue = list(map(filter(escapeSpecialChars(directory, name), for name in metadata.names.queue))
+    # SavedQueue = listToQueue([escapeSpecialChars(directory, name) for name in metadata.names.queue])
+    # SavedQueue = listToQueue([f"{directory}/{name}".replace(" ", "-") for name in metadata.names.queue])
+    SavedQueue = listToQueue([escapeSpecialChars(directory, name) for name in metadata.names.queue])
+
+    # for name in metadata.names.queue
+        # name.replace("/", "ith") 
+        # f"{directory}/{name}".replace(" ", "-")
+
+    # f"{directory}/{name.replace({backslash}, {escapeKey}}"
     if (not dry_run): 
         while (not metadata.links.empty() and not SavedQueue.empty()):
-            download(printMetadata, args=(metadata.links, SavedQueue)) 
-    os.rmdir(directory)
+            download(downloadMetadata, args=(metadata.links, SavedQueue)) 
+    # os.rmdir(directory)

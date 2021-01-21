@@ -21,23 +21,28 @@ def createMasterIndex():
     downloader.createIndex()
 
 def downloadAllMiniMetadata():
+    print(f"============ Tag Extraction ============")
     end = extractEnd(extractProductPages(createSoup("creations.html")))
-    print(end)
+    print(f"Last Page Offset: {end}")
     offset = 0
     pagesEnd = (len([offset for offset in ([*range(offset, end, 48)] + [end])]))
-    print(pagesEnd)
+    print(f"Last Page Index: {pagesEnd}")
+
     base = "./html"
     directory = f"{base}/products"
     pageIndexes = [f"{directory}/pages-{index}" for index in range(1, pagesEnd)]
-    print(f"============ Tag Extraction ============")
+    print(f"")
+
     currentIndex = 1
-    while (currentIndex < pagesEnd):
+    pageIndex = 0
+    while (currentIndex <= pagesEnd):
         soup = createSoup(f"{base}/mz4250-creations-page-{currentIndex}")
         metadata = setupMetadata(soup)
 
         print(f"Iteration: {currentIndex}")
-        getProductHTML(soup, metadata, pageIndexes[currentIndex], dry_run=False)
+        getProductHTML(soup, metadata, pageIndexes[pageIndex], dry_run=False)
         currentIndex += 1
+        pageIndex += 1
 
     print(f"")
 
