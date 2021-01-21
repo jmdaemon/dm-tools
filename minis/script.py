@@ -23,8 +23,22 @@ def createMasterIndex():
     downloader.createIndex()
 
 def downloadAllMiniMetadata():
-    metadata: Metadata = setupMetadata
-    getProductHTML(soup, metadata, dry_run=False)
+    end = extractEnd(extractProductPages(soup))
+    print(end)
+    offset = 0
+    pagesEnd = (len([offset for offset in ([*range(offset, end, 48)] + [end])]))
+    print(pagesEnd)
+    directory = "./html/products"
+    pageIndexes = [f"{directory}/pages-{index}" for index in range(1, pagesEnd)]
+    print(f"============ Tag Extraction ============")
+    index = 1
+    # for page in pageIndexes:
+    print(f"Iteration: {index}")
+    # getProductHTML(soup, setupMetadata(), page, dry_run=False)
+    getProductHTML(soup, setupMetadata(), pageIndexes[0], dry_run=False)
+    # index += 1
+
+    print(f"")
 
 # downloadHTMLIndices()
 # downloadAllMinis()

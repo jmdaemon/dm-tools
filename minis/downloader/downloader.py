@@ -87,7 +87,27 @@ def printMetadata(LinksQueue, SavedQueue):
 
 def getProductHTML(soup, metadata, directory = "./html/products", index = 1, offset = 0, dry_run = False):
     if(dirExists(directory)): return
+    # products = [f"{directory}/{name}".replace(" ", "-") for name in metadata.names.queue]
+    # end = extractEnd(extractProductPages(soup))
+    # print(end)
+    # pagesEnd = (len([offset for offset in ([*range(offset, end, 48)] + [end])]))
+    # print(pagesEnd)
+    # pageIndexes = [f"{directory}/pages-{index}" for index in range(1, pagesEnd)]
+    # print(pageIndexes)
     SavedQueue = listToQueue([f"{directory}/{name}".replace(" ", "-") for name in metadata.names.queue])
+
+    # pageIndexes = [f"{directory}/pages-{index}" for index in range(1, pagesEnd)]
+    # LocalSavedNames = [f"{name}".replace(" ", "-") for name in metadata.names.queue]
+
+    # for(path in pageIndexes):
+    # savedList = []
+    # pageIndex = 1
+    # while(pageIndex <= pagesEnd): 
+        # path = pageIndexes[pageIndex]
+        # savedList.append([f"{path}/{name}".replace(" ", "-") for name in metadata.names.queue])
+        # pageIndex += 1
+    # SavedQueue = listToQueue(savedList)
+
     if (not dry_run): 
         while (not metadata.links.empty() and not SavedQueue.empty()):
             download(printMetadata, args=(metadata.links, SavedQueue)) 
