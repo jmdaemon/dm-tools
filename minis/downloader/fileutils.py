@@ -1,8 +1,9 @@
 import os
+import pathlib
 
 def createDir(path):
-    try:
-        os.mkdir(path)
+    try: 
+        pathlib.Path(path).mkdir(parents=True, exist_ok=True)
     except OSError:
         print ("Creation of the directory %s failed" % path)
     else:
