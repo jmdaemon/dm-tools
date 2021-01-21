@@ -31,6 +31,12 @@ def createDir(path):
     else:
         print ("Successfully created the directory %s " % path)
 
+def dirExists(directory):
+    if(os.path.exists(directory)):
+        print(f"{directory} already exists.")
+        return
+    createDir(directory)
+
 def writeToFile(content, fileName, modes = 'w'):
     with open(fileName, modes) as f:
         f.write(content)
@@ -53,14 +59,7 @@ def getPages(soup):
 def listToQueue(itemList):
     itemQueue = queue.Queue()
     list = [itemQueue.put(item) for item in itemList]
-    return itemQueue
-
-def dirExists(directory):
-    if(os.path.exists(directory)):
-        print(f"{directory} already exists.")
-        return
-    elif (not os.path.exists(directory)):
-        os.makedirs(directory)
+    return itemQueue 
 
 def getAllHTML(soup, directory = "./html", index = 1, offset = 0, dry_run = False):
     if (dirExists(directory)): return
@@ -102,6 +101,7 @@ def saveMini():
         # writeToFile(mini.content, f"{mini_dir}/{names.get()}.zip", 'wb')
 
 def downloadMini(mini_ids, directory = "miniatures"):
+    if 
     if (not os.path.exists(directory)):
         os.makedirs(directory)
         mini_dir = directory
@@ -109,10 +109,6 @@ def downloadMini(mini_ids, directory = "miniatures"):
     download(downloadLinks, names, saveMini)
     print(f"")
 
-def getMiniMetadata():
-    printProductMetadata(mini_saved, mini_links)
-    # html = requests.get(links.get()).text
-    # writeToFile(html, names.get())
 def printMetadata(LinksQueue, SavedQueue):
     printProductMetadata(SavedQueue, LinksQueue)
 
