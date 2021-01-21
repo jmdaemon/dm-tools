@@ -11,10 +11,6 @@ from .extract import *
 
 # downloadAllMinis.py - Downloads .stl files of miniatures
 
-site        = "https://www.shapeways.com/designer/mz4250/creations"
-mini_dir    = "miniatures"
-
-mini_links = queue.Queue()
 mini_saved = queue.Queue()
 
 def createSoup(fileName):
@@ -61,7 +57,7 @@ def listToQueue(itemList):
     list = [itemQueue.put(item) for item in itemList]
     return itemQueue 
 
-def getAllHTML(soup, directory = "./html", index = 1, offset = 0, dry_run = False):
+def getAllHTML(soup, site="https://www.shapeways.com/designer/mz4250/creations", directory = "./html", index = 1, offset = 0, dry_run = False):
     if (dirExists(directory)): return
     end = getEnd(getPages(soup))
     pagesList = [f'{site}?s={offset}' for offset in ([*range(offset, end, 48)] + [end])]
@@ -71,13 +67,13 @@ def getAllHTML(soup, directory = "./html", index = 1, offset = 0, dry_run = Fals
         while (not pages.empty() and not saved.empty()):
             download(saveHTML, args=(pages, saved)) 
 
-def createHeaders():
+def createHeaders(links):
     headers = { 
         'Content-type': 'application/zip',
         'Host': 'www.shapeways.com',
         'User-Agent': "Mozilla/5.0 (X11; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0",
         'Accept': "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-        'Referer': minis_links.get(),
+        'Referer': links.get(),
         'Cookie': '__cfduid=dd4e4ad5a12f3eeb9a89139f43b137d211608008733; shapeways_guest=2ad9b47812f7643badebb042252d45aefa12e9eb; whid=9; PHPSESSID=u1bh765cf6oosb7dcco7433gdc; sw_usr=187af943d900b0a1753cb31f192f4f1f06854c9c; uauth=2343099'
     }
     return headers
@@ -93,22 +89,17 @@ def getEnd(tag):
     index = regexp.search(tag[5]['href'])
     return int(index.group(0))
 
-def saveMini(directory, downloadLinks, names):
-    # mini = requests.get(downloadLinks.get(), allow_redirects=True, headers=createHeaders(), auth=(loadCredentials()))
-    # print(f"Saving as: {mini_dir}/{names.get()}.zip", flush=True)
+def retrieveMiniature(directory, downloadLinks, links, names):
+    mini = requests.get(downloadLinks.get(), allow_redirects=True, headers=createHeaders(links), auth=(loadCredentials()))
     print(f"Saving as: {directory}/{names.get()}.zip", flush=True)
-    # if (mini.status_code != 404):
-        # print(f"Saving as: {mini_dir}/{names.get()}.zip")
-        # writeToFile(mini.content, f"{mini_dir}/{names.get()}.zip", 'wb')
+    if (mini.status_code != 404):
+        writeToFile(mini.content, f"{directory}/{names.get()}.zip", 'wb')
 
 def downloadMini(metadata, directory = "miniatures"):
     if (dirExists(directory)): return
-    # downloadLinks = queue.Queue()
-    # list = [downloadLinks.put(f'https://www.shapeways.com/product/download/{mini_id}') for mini_id in metadata.ids.queue]
-    # download(downloadLinks, names, saveMini)
     downloadLinks = listToQueue([(f'https://www.shapeways.com/product/download/{mini_id}') for mini_id in metadata.ids.queue])
     while (not downloadLinks.empty() and not metadata.names.empty()):
-        download(saveMini, args=(directory, downloadLinks, metadata.names)) 
+        download(retrieveMiniature, args=(directory, downloadLinks, metadata.links, metadata.names)) 
     print(f"")
 
 def printMetadata(LinksQueue, SavedQueue):
