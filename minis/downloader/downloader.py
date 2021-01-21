@@ -8,6 +8,7 @@ import json
 
 from .show_info import *
 from .extract import *
+from .fileutils import *
 
 # downloadAllMinis.py - Downloads .stl files of miniatures
 
@@ -17,25 +18,6 @@ def createSoup(fileName):
     with open(fileName, 'r') as f: 
         soup = BeautifulSoup(f, 'html.parser')
         return soup
-
-def createDir(path):
-    try:
-        os.mkdir(path)
-    except OSError:
-        print ("Creation of the directory %s failed" % path)
-    else:
-        print ("Successfully created the directory %s " % path)
-
-def dirExists(directory):
-    if(os.path.exists(directory)):
-        print(f"\"{directory}\" already exists.")
-        return True
-    else:
-        createDir(directory)
-
-def writeToFile(content, fileName, modes = 'w'):
-    with open(fileName, modes) as f:
-        f.write(content)
 
 def saveHTML(pages, saved):
     printQueues(pages, saved)
@@ -95,7 +77,7 @@ def retrieveMiniature(directory, downloadLinks, links, names):
     if (mini.status_code != 404):
         writeToFile(mini.content, f"{directory}/{names.get()}.zip", 'wb')
 
-def downloadMini(metadata, directory = "miniatures"):
+def downloadMiniature(metadata, directory = "miniatures"):
     if (dirExists(directory)): return
     downloadLinks = listToQueue([(f'https://www.shapeways.com/product/download/{mini_id}') for mini_id in metadata.ids.queue])
     while (not downloadLinks.empty() and not metadata.names.empty()):

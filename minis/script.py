@@ -19,35 +19,28 @@ from downloader import *
 soup = downloader.createSoup("creations.html")
 site = "https://www.shapeways.com/designer/mz4250/creations"
 
+def setupMetadata():
+    linksList   = extractMiniatureLinks(site, soup)
+    namesList   = extractMiniatureNames(site, soup)
+    idsList     = extractMiniatureProductIds(soup, linksList)
+    metadata = Metadata(linksList, namesList, idsList)
+    return metadata
+
+
 def downloadHTMLIndices():
     # downloader.getAllHTML(soup, "./html")
     # downloader.getAllHTML(soup, "./null", dry_run=True)
     downloader.getAllHTML(soup, "./null")
 
 def downloadAllMinis():
-    # links = downloader.getLinks(site, soup)
-    # minis_ids = downloader.getIds(links, soup)
-    # downloader.getNames(site, soup)
-    # downloader.downloadMini(minis_ids)
-    linksList   = extractMiniatureLinks(site, soup)
-    namesList   = extractMiniatureNames(site, soup)
-    idsList     = extractMiniatureProductIds(soup, linksList)
-    metadata = Metadata(linksList, namesList, idsList)
-    downloader.downloadMini(metadata)
+    downloadMiniature(setupMetadata())
 
 def createMasterIndex():
-    links = downloader.getLinks(site, soup)
-    mini_ids = downloader.getIds(links, soup)
-    downloader.getNames(site, soup)
+
     downloader.createIndex()
 
 def downloadAllMiniMetadata():
-    linksList   = extractMiniatureLinks(site, soup)
-    namesList   = extractMiniatureNames(site, soup)
-    idsList     = extractMiniatureProductIds(soup, linksList)
-    metadata = Metadata(linksList, namesList, idsList)
-    # populateQueue(linksList, namesList, idsList, metadata)
-    getProductHTML(soup, metadata, dry_run=False)
+    getProductHTML(soup, setupMetadata, dry_run=False)
 
 # downloadHTMLIndices()
 downloadAllMinis()
