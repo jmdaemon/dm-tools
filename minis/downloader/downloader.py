@@ -31,9 +31,9 @@ class Metadata():
         self.ids   = queue.Queue()
 
         self.populate(links, names, ids)
-        self.printQueue("Links", "link", self.links)
-        self.printQueue("Names", "name", self.names)
-        self.printQueue("Ids", "id", self.ids)
+        self.printQueue("Links", "Miniature Link", self.links)
+        self.printQueue("Names", "Miniature Name", self.names)
+        self.printQueue("Ids", "Product ID", self.ids)
 
     def populate(self, links, names, ids):
         list = [self.links.put(link) for link in links]
@@ -44,19 +44,19 @@ class Metadata():
         print(f"============ {title} ============")
         list = [print(f"{keyword}: {item}") for item in itemQueue.queue] + [print(f"")]
 
-    def getLinks():
+    def returnQueue(MetadataQueue):
         result: queue.Query()
-        result = self.links
+        result = MetadataQueue
         return result
+
+    def getLinks():
+        returnQueue(self.links)
 
     def getNames():
-        result: queue.Query()
-        result = self.names
-        return result
-        # return self.names
+        returnQueue(self.names)
 
     def getIds():
-        return self.ids
+        returnQueue(self.ids)
 
 # BeautifulSoup
 def createSoup(fileName):
@@ -127,23 +127,6 @@ def getEnd(tag):
     index = regexp.search(tag[5]['href'])
     return int(index.group(0))
 
-# def createDict(title, keyword, itemList):
-    # itemDict = dict.fromkeys(itemList, 1)
-    # print(f"============ {title} ============")
-    # list = [print(f"{keyword}: {item}") for item in itemDict] + [print(f"")]
-    # return itemDict
-
-# def pushOntoQueue(title, keyword, itemList, itemQueue):
-    # list = [itemQueue.put(item) for item in createDict(title, keyword, itemList)]
-
-# def populateQueue(linksList, namesList, idsList, metadata):
-    # # pushOntoQueue("Links", "link", linksList, links)
-    # # pushOntoQueue("Names", "name", namesList, names)
-    # # createDict("Ids", "id", idsList)
-    # pushOntoQueue("Links", "link", linksList, metadata.links)
-    # pushOntoQueue("Names", "name", namesList, metadata.names)
-    # pushOntoQueue("Ids", "id", idsList, metadata.ids)
-
 def saveMini():
     # mini = requests.get(downloadLinks.get(), allow_redirects=True, headers=createHeaders(), auth=(loadCredentials()))
     print(f"Saving as: {mini_dir}/{names.get()}.zip", flush=True)
@@ -171,20 +154,9 @@ def getProductHTML(soup, metadata, directory = "./html/products", index = 1, off
     elif (not os.path.exists(directory)):
         os.makedirs(directory)
     # minis_savedList = [f"{directory}/page-{index}/{name}".replace(" ", "-") for name in mini_names]
-    # minis_savedList = [f"{directory}/{name}".replace(" ", "-") for name in names.queue]
-    # names = metadata.getNames.queue()
-    # names = queue.Queue(metadata.getNames).queue
-    # links = queue.Queue(metadata.getLinks).queue
-    # names = (metadata.getNames).queue()
-    # links = (metadata.getLinks).queue()
-    names = metadata.names.queue
-    links = metadata.links.queue
-    # minis_savedList = [f"{directory}/{name}".replace(" ", "-") for name in names.queue]
-    minis_savedList = [f"{directory}/{name}".replace(" ", "-") for name in names]
+    minis_savedList = [f"{directory}/{name}".replace(" ", "-") for name in metadata.names.queue]
     list = [mini_saved.put(mini_savedData) for mini_savedData in minis_savedList]
-    # list = [mini_links.put(mini_link) for mini_link in links.queue]
-    # list = [mini_links.put(mini_link) for mini_link in metadata.getLinks().queue]
-    list = [mini_links.put(link) for link in links]
+    list = [mini_links.put(link) for link in metadata.links.queue]
     print(f"============ Mini Metadata ============")
     if (not dry_run): download(mini_links, mini_saved, getMiniMetadata) 
     os.rmdir(directory)
