@@ -7,6 +7,7 @@ import threading, queue
 import json
 
 from .show_info import *
+from .extract import *
 
 # downloadAllMinis.py - Downloads .stl files of miniatures
 
@@ -16,11 +17,71 @@ mini_dir    = "miniatures"
 pages = queue.Queue()       # pages => HTML Pages
 saved = queue.Queue()       # saved => Save HTML Pages As [filename]
 
-links = queue.Queue()
+# links = queue.Queue()
+# names = queue.Queue()
+# ids = queue.Queue()
 mini_links = queue.Queue()
 mini_saved = queue.Queue()
-names = queue.Queue()
 downloadLinks = queue.Queue()
+
+class Metadata():
+
+    # def populate(self, links, names, ids):
+    def populate(self, links, names, ids):
+        list = [self.links.put(link) for link in links]
+        list = [self.names.put(name) for name in names]
+        list = [self.ids.put(mini_id) for mini_id in ids]
+
+    def printLinks():
+        list = [print(f"link: {link}") for link in self.links]
+
+    # def __init__(links, names, ids):
+    def __init__(self, links, names, ids):
+        # self.links: queue.Queue() = Metadata.populateQueue(self.links, links)
+        # self.names: queue.Queue() = Metadata.populateQueue(self.names, names)
+        # self.ids  : queue.Queue() = Metadata.populateQueue(self.ids, ids)
+        self.links = queue.Queue()
+        self.names = queue.Queue()
+        self.ids   = queue.Queue()
+        # list = [print(f"link: {link}") for link in links]
+        # list = [self.links.put(link) for link in links]
+        # list = [self.names.put(name) for name in names]
+        # list = [self.ids.put(mini_id) for mini_id in ids]
+        self.populate(links, names, ids)
+        list = [print(f"link: {link}") for link in self.links.queue]
+        # self.printLinks
+        # self.printLinks
+
+
+
+
+        # list = [itemQueue.put(item) for item in itemList]
+    def getLinks():
+        return self.links
+
+    def getNames():
+        # return Queue((self.names))
+        return self.names
+
+    def getIds():
+        return self.ids
+
+    # def populateQueue(itemQueue, itemList): 
+        # list = [itemQueue.put(item) for item in itemList]
+
+    def setLinks(LinksList): 
+        populateQueue(LinksList)
+
+    def setIds(IdsList):
+        populateQueue(IdsList)
+
+    def setNames(NamesList):
+        populateQueue(NamesList)
+
+
+
+
+
 
 # BeautifulSoup
 def createSoup(fileName):
@@ -100,34 +161,13 @@ def createDict(title, keyword, itemList):
 def pushOntoQueue(title, keyword, itemList, itemQueue):
     list = [itemQueue.put(item) for item in createDict(title, keyword, itemList)]
 
-def removeEmpty(name):
-    if(name):
-        return True
-    else:
-        return False 
-
-def populateQueue(linksList, namesList, idsList):
-    pushOntoQueue("Links", "link", linksList, links)
-    pushOntoQueue("Names", "name", namesList, names)
-    createDict("Ids", "id", idsList)
-
-def extractMiniatureLinks(site, soup):
-    exp = r"\"?(https://www.shapeways.com/product/\w{9}/)(\w*-*)*(\?optionId=\d{1,16})(.*user-profile)\"?"
-    URLS = soup.find_all('a', href = re.compile(exp))
-    linkList = list(map(lambda url: url['href'], URLS))
-    return linkList
-
-def extractMiniatureNames(site, soup):
-    exp = r"\"?(https://www.shapeways.com/product/\w{9}/)(\w*-*)*(\?optionId=\d{1,16})(.*user-profile)\"?"
-    results = soup.find_all('a', href = re.compile(exp))
-    nameList = list(filter(removeEmpty, map(lambda name: name.get_text(strip=True), results)))
-    return nameList
-
-def extractMiniatureProductIds(soup): 
-    exp = r"(\"?)(?<=https://www.shapeways.com/product/)(\w+)"
-    regex = re.compile(exp)
-    idsList = [regex.search(link).group(0) for link in links.queue]
-    return idsList
+def populateQueue(linksList, namesList, idsList, metadata):
+    # pushOntoQueue("Links", "link", linksList, links)
+    # pushOntoQueue("Names", "name", namesList, names)
+    # createDict("Ids", "id", idsList)
+    pushOntoQueue("Links", "link", linksList, metadata.links)
+    pushOntoQueue("Names", "name", namesList, metadata.names)
+    pushOntoQueue("Ids", "id", idsList, metadata.ids)
 
 def saveMini():
     # mini = requests.get(downloadLinks.get(), allow_redirects=True, headers=createHeaders(), auth=(loadCredentials()))
@@ -149,16 +189,23 @@ def getMiniMetadata():
     # html = requests.get(links.get()).text
     # writeToFile(html, names.get())
 
-def getProductHTML(soup, directory = "./html/products", index = 1, offset = 0, dry_run = False):
+def getProductHTML(soup, metadata, directory = "./html/products", index = 1, offset = 0, dry_run = False):
     if(os.path.exists(directory)):
         print(f"Directory {directory} already exists.")
         return
     elif (not os.path.exists(directory)):
         os.makedirs(directory)
     # minis_savedList = [f"{directory}/page-{index}/{name}".replace(" ", "-") for name in mini_names]
-    minis_savedList = [f"{directory}/{name}".replace(" ", "-") for name in names.queue]
+    # minis_savedList = [f"{directory}/{name}".replace(" ", "-") for name in names.queue]
+    # names = metadata.getNames.queue()
+    names = queue.Queue(metadata.getNames).queue
+    links = queue.Queue(metadata.getLinks).queue
+    # minis_savedList = [f"{directory}/{name}".replace(" ", "-") for name in names.queue]
+    minis_savedList = [f"{directory}/{name}".replace(" ", "-") for name in names]
     list = [mini_saved.put(mini_savedData) for mini_savedData in minis_savedList]
-    list = [mini_links.put(mini_link) for mini_link in links.queue]
+    # list = [mini_links.put(mini_link) for mini_link in links.queue]
+    # list = [mini_links.put(mini_link) for mini_link in metadata.getLinks().queue]
+    list = [mini_links.put(link) for link in links]
     print(f"============ Mini Metadata ============")
     if (not dry_run): download(mini_links, mini_saved, getMiniMetadata) 
     os.rmdir(directory)
