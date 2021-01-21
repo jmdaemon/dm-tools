@@ -19,29 +19,33 @@ def createSoup(fileName):
         soup = BeautifulSoup(f, 'html.parser')
         return soup
 
+def extractProductPages(soup):
+    regexp = r"(/designer/mz4250/creations\?s=\d{0,4}#more-products)"
+    pages = soup.find_all('a', href = re.compile(regexp))
+    return pages
+
+def extractEnd(tag):
+    exp = r"(?<=/designer/mz4250/creations\?s=)(\d{1,4})(?=#more-products)"
+    regexp = re.compile(exp)
+    index = regexp.search(tag[5]['href'])
+    return int(index.group(0))
+
 def saveHTML(pages, saved):
-    printQueues(pages, saved)
-    # html = requests.get(pages.get()).text
-    # writeToFile(html, saved.get())
+    writeToFile(requests.get(pages.get()).text, saved.get())
 
 def download(target, args):
     if (threading.active_count() <= 4): worker = threading.Thread(target=target, args=args).start() 
     else:
         list = [thread.join for thread in threading.enumerate() if thread is not threading.main_thread()]
     
-def getPages(soup):
-    regexp = r"(/designer/mz4250/creations\?s=\d{0,4}#more-products)"
-    pages = soup.find_all('a', href = re.compile(regexp))
-    return pages
-
 def listToQueue(itemList):
     itemQueue = queue.Queue()
     list = [itemQueue.put(item) for item in itemList]
     return itemQueue 
 
-def getAllHTML(soup, site="https://www.shapeways.com/designer/mz4250/creations", directory = "./html", index = 1, offset = 0, dry_run = False):
+def getCreationsHTML(soup, site="https://www.shapeways.com/designer/mz4250/creations", directory = "./html", index = 1, offset = 0, dry_run = False):
     if (dirExists(directory)): return
-    end = getEnd(getPages(soup))
+    end = extractEnd(extractProductPages(soup))
     pagesList = [f'{site}?s={offset}' for offset in ([*range(offset, end, 48)] + [end])]
     pages = listToQueue(pagesList)
     saved = listToQueue([f'{directory}/mz4250-creations-page-{index}' for index in range(index, len(pagesList) + 1)])
@@ -65,12 +69,6 @@ def loadCredentials(creds_file = 'creds.json'):
         data = json.load(f)
     return data['username'], data['password']
 
-def getEnd(tag):
-    exp = r"(?<=/designer/mz4250/creations\?s=)(\d{1,4})(?=#more-products)"
-    regexp = re.compile(exp)
-    index = regexp.search(tag[5]['href'])
-    return int(index.group(0))
-
 def retrieveMiniature(directory, downloadLinks, links, names):
     mini = requests.get(downloadLinks.get(), allow_redirects=True, headers=createHeaders(links), auth=(loadCredentials()))
     print(f"Saving as: {directory}/{names.get()}.zip", flush=True)
@@ -88,11 +86,9 @@ def printMetadata(LinksQueue, SavedQueue):
     printProductMetadata(SavedQueue, LinksQueue)
 
 def getProductHTML(soup, metadata, directory = "./html/products", index = 1, offset = 0, dry_run = False):
-    dirExists(directory)
+    if(dirExists(directory)): return
     SavedQueue = listToQueue([f"{directory}/{name}".replace(" ", "-") for name in metadata.names.queue])
-    print(f"============ Mini Metadata ============")
     if (not dry_run): 
         while (not metadata.links.empty() and not SavedQueue.empty()):
             download(printMetadata, args=(metadata.links, SavedQueue)) 
     os.rmdir(directory)
-    print(f"")
