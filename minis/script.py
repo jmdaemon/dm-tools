@@ -37,13 +37,6 @@ def createMasterIndex():
     downloader.createIndex()
 
 def downloadAllMiniMetadata():
-    # metadataUtil = ExtractMetadata()
-    # linksList   = ExtractMetadata.extractMiniatureLinks(site, soup)
-    # namesList   = ExtractMetadata.extractMiniatureNames(site, soup)
-    # idsList     = ExtractMetadata.extractMiniatureProductIds(soup)
-    # linksList   = metadataUtil.extractMiniatureLinks(site, soup)
-    # namesList   = metadataUtil.extractMiniatureNames(site, soup)
-    # idsList     = metadataUtil.extractMiniatureProductIds(soup)
     linksList   = extractMiniatureLinks(site, soup)
     namesList   = extractMiniatureNames(site, soup)
     idsList     = extractMiniatureProductIds(soup, linksList)
@@ -51,7 +44,7 @@ def downloadAllMiniMetadata():
     # populateQueue(linksList, namesList, idsList, metadata)
     getProductHTML(soup, metadata, dry_run=False)
 
-# downloadHTMLIndices()
+downloadHTMLIndices()
 # downloadAllMinis()
 # createMasterIndex()
-downloadAllMiniMetadata()
+# downloadAllMiniMetadata()

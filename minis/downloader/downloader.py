@@ -43,9 +43,10 @@ def writeToFile(content, fileName, modes = 'w'):
     with open(fileName, modes) as f:
         f.write(content)
 
-def saveHTML():
-    html = requests.get(pages.get()).text
-    writeToFile(html, saved.get())
+def saveHTML(pages, saved):
+    printQueues(pages, saved)
+    # html = requests.get(pages.get()).text
+    # writeToFile(html, saved.get())
 
 def download(firstQueue, secondQueue, target):
     while (not firstQueue.empty() and not secondQueue.empty()):
@@ -74,9 +75,14 @@ def getAllHTML(soup, directory = "./html", index = 1, offset = 0, dry_run = Fals
     end = getEnd(getPages(soup))
     pagesList = [f'{site}?s={offset}' for offset in ([*range(offset, end, 48)] + [end])]
     savedList = [f'{directory}/mz4250-creations-page-{index}' for index in range(index, len(pagesList) + 1)]
+    pages = queue.Queue()
+    saved = queue.Queue()
     list = [pages.put(page) for page in pagesList]
     list = [saved.put(saveFile) for saveFile in savedList]
-    if (not dry_run): download(pages, saved, saveHTML)
+    # if (not dry_run): download(pages, saved, saveHTML)
+    if (not dry_run):
+        while (not pages.empty() and not saved.empty()):
+            downloadWithArgs(saveHTML, args=(pages, saved)) 
 
 def createHeaders():
     headers = { 
@@ -133,13 +139,7 @@ def getProductHTML(soup, metadata, directory = "./html/products", index = 1, off
     minis_savedList = [f"{directory}/{name}".replace(" ", "-") for name in metadata.names.queue]
     SavedQueue = queue.Queue() 
     list = [SavedQueue.put(mini_savedData) for mini_savedData in minis_savedList]
-    # list = [mini_saved.put(mini_savedData) for mini_savedData in minis_savedList]
-    # list = [mini_links.put(link) for link in metadata.links.queue]
     print(f"============ Mini Metadata ============")
-    # if (not dry_run): download(mini_links, mini_saved, getMiniMetadata) 
-    # if (not dry_run): downloadWithArgs(mini_links, mini_saved, getMiniMetadata, args=(metadata.names.queue, metadata.links.queue)) 
-    # if (not dry_run): downloadWithArgs(mini_links, mini_saved, printMetadata, (metadata.links.queue, SavedQueue)) 
-    # if (not dry_run): downloadWithArgs(metadata.links, SavedQueue, printMetadata, (metadata.links.queue, SavedQueue)) 
     if (not dry_run): 
         while (not metadata.links.empty() and not SavedQueue.empty()):
             downloadWithArgs(printMetadata, args=(metadata.links, SavedQueue)) 
