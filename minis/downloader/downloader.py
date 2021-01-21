@@ -24,40 +24,6 @@ mini_links = queue.Queue()
 mini_saved = queue.Queue()
 downloadLinks = queue.Queue()
 
-class Metadata():
-    def __init__(self, links, names, ids):
-        self.links = queue.Queue()
-        self.names = queue.Queue()
-        self.ids   = queue.Queue()
-
-        self.populate(links, names, ids)
-        self.printQueue("Links", "Miniature Link", self.links)
-        self.printQueue("Names", "Miniature Name", self.names)
-        self.printQueue("Ids", "Product ID", self.ids)
-
-    def populate(self, links, names, ids):
-        list = [self.links.put(link) for link in links]
-        list = [self.names.put(name) for name in names]
-        list = [self.ids.put(mini_id) for mini_id in ids]
-
-    def printQueue(self, title, keyword, itemQueue):
-        print(f"============ {title} ============")
-        list = [print(f"{keyword}: {item}") for item in itemQueue.queue] + [print(f"")]
-
-    def returnQueue(MetadataQueue):
-        result: queue.Query()
-        result = MetadataQueue
-        return result
-
-    def getLinks():
-        returnQueue(self.links)
-
-    def getNames():
-        returnQueue(self.names)
-
-    def getIds():
-        returnQueue(self.ids)
-
 # BeautifulSoup
 def createSoup(fileName):
     with open(fileName, 'r') as f: 
@@ -86,6 +52,13 @@ def download(firstQueue, secondQueue, target):
         if (threading.active_count() <= 4): worker = threading.Thread(target=target).start() 
         else:
             list = [thread.join for thread in threading.enumerate() if thread is not threading.main_thread()]
+
+# def downloadWithArgs(firstQueue, secondQueue, target, args):
+    # while (not firstQueue.empty() and not secondQueue.empty()):
+def downloadWithArgs(target, args):
+    if (threading.active_count() <= 4): worker = threading.Thread(target=target, args=args).start() 
+    else:
+        list = [thread.join for thread in threading.enumerate() if thread is not threading.main_thread()]
     
 def getPages(soup):
     regexp = r"(/designer/mz4250/creations\?s=\d{0,4}#more-products)"
@@ -146,6 +119,9 @@ def getMiniMetadata():
     printProductMetadata(mini_saved, mini_links)
     # html = requests.get(links.get()).text
     # writeToFile(html, names.get())
+def printMetadata(LinksQueue, SavedQueue):
+    printProductMetadata(SavedQueue, LinksQueue)
+
 
 def getProductHTML(soup, metadata, directory = "./html/products", index = 1, offset = 0, dry_run = False):
     if(os.path.exists(directory)):
@@ -155,9 +131,17 @@ def getProductHTML(soup, metadata, directory = "./html/products", index = 1, off
         os.makedirs(directory)
     # minis_savedList = [f"{directory}/page-{index}/{name}".replace(" ", "-") for name in mini_names]
     minis_savedList = [f"{directory}/{name}".replace(" ", "-") for name in metadata.names.queue]
-    list = [mini_saved.put(mini_savedData) for mini_savedData in minis_savedList]
-    list = [mini_links.put(link) for link in metadata.links.queue]
+    SavedQueue = queue.Queue() 
+    list = [SavedQueue.put(mini_savedData) for mini_savedData in minis_savedList]
+    # list = [mini_saved.put(mini_savedData) for mini_savedData in minis_savedList]
+    # list = [mini_links.put(link) for link in metadata.links.queue]
     print(f"============ Mini Metadata ============")
-    if (not dry_run): download(mini_links, mini_saved, getMiniMetadata) 
+    # if (not dry_run): download(mini_links, mini_saved, getMiniMetadata) 
+    # if (not dry_run): downloadWithArgs(mini_links, mini_saved, getMiniMetadata, args=(metadata.names.queue, metadata.links.queue)) 
+    # if (not dry_run): downloadWithArgs(mini_links, mini_saved, printMetadata, (metadata.links.queue, SavedQueue)) 
+    # if (not dry_run): downloadWithArgs(metadata.links, SavedQueue, printMetadata, (metadata.links.queue, SavedQueue)) 
+    if (not dry_run): 
+        while (not metadata.links.empty() and not SavedQueue.empty()):
+            downloadWithArgs(printMetadata, args=(metadata.links, SavedQueue)) 
     os.rmdir(directory)
     print(f"")
