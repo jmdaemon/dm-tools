@@ -2,8 +2,6 @@
 
 from downloader import *
 
-# soup = createSoup("creations.html")
-
 def setupMetadata(soup):
     linksList   = extractMiniatureLinks(soup)
     namesList   = extractMiniatureNames(soup)
@@ -33,19 +31,13 @@ def downloadAllMiniMetadata():
     pageIndexes = [f"{directory}/pages-{index}" for index in range(1, pagesEnd)]
     print(f"============ Tag Extraction ============")
     currentIndex = 1
-    # for page in pageIndexes:
     while (currentIndex < pagesEnd):
         soup = createSoup(f"{base}/mz4250-creations-page-{currentIndex}")
         metadata = setupMetadata(soup)
-        # Make new Soup
-        # Create new Metadata
-        # Get product html
+
         print(f"Iteration: {currentIndex}")
-        # getProductHTML(soup, setupMetadata(), page, dry_run=False)
-        # getProductHTML(soup, setupMetadata(), pageIndexes[0], dry_run=False)
         getProductHTML(soup, metadata, pageIndexes[currentIndex], dry_run=False)
         currentIndex += 1
-    # currentIndex += 1
 
     print(f"")
 
