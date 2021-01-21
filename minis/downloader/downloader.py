@@ -12,8 +12,6 @@ from .fileutils import *
 
 # downloadAllMinis.py - Downloads .stl files of miniatures
 
-mini_saved = queue.Queue()
-
 def createSoup(fileName):
     with open(fileName, 'r') as f: 
         soup = BeautifulSoup(f, 'html.parser')
