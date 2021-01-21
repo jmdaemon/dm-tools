@@ -16,7 +16,6 @@ mini_dir    = "miniatures"
 
 mini_links = queue.Queue()
 mini_saved = queue.Queue()
-downloadLinks = queue.Queue()
 
 def createSoup(fileName):
     with open(fileName, 'r') as f: 
@@ -102,13 +101,12 @@ def saveMini(directory, downloadLinks, names):
         # print(f"Saving as: {mini_dir}/{names.get()}.zip")
         # writeToFile(mini.content, f"{mini_dir}/{names.get()}.zip", 'wb')
 
-# def downloadMini(mini_ids, directory = "miniatures"):
 def downloadMini(metadata, directory = "miniatures"):
-    if (dirExists(directory)): 
-        return
-    mini_dir = directory
-    list = [downloadLinks.put(f'https://www.shapeways.com/product/download/{mini_id}') for mini_id in metadata.ids.queue]
+    if (dirExists(directory)): return
+    # downloadLinks = queue.Queue()
+    # list = [downloadLinks.put(f'https://www.shapeways.com/product/download/{mini_id}') for mini_id in metadata.ids.queue]
     # download(downloadLinks, names, saveMini)
+    downloadLinks = listToQueue([(f'https://www.shapeways.com/product/download/{mini_id}') for mini_id in metadata.ids.queue])
     while (not downloadLinks.empty() and not metadata.names.empty()):
         download(saveMini, args=(directory, downloadLinks, metadata.names)) 
     print(f"")
