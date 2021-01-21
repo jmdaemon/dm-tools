@@ -31,50 +31,32 @@ class Metadata():
         self.ids   = queue.Queue()
 
         self.populate(links, names, ids)
-        # list = [print(f"link: {link}") for link in self.links.queue]
-        # list = [print(f"names: {name}") for name in self.names.queue]
         self.printQueue("Links", "link", self.links)
+        self.printQueue("Names", "name", self.names)
+        self.printQueue("Ids", "id", self.ids)
 
     def populate(self, links, names, ids):
         list = [self.links.put(link) for link in links]
         list = [self.names.put(name) for name in names]
         list = [self.ids.put(mini_id) for mini_id in ids]
 
-    def listToDict(itemList):
-        return dict.fromkeys(itemList, 1)
-
-    # def createDict(title, keyword, itemList):
-        # itemDict = dict.fromkeys(itemList, 1)
-        # print(f"============ {title} ============")
-        # list = [print(f"{keyword}: {item}") for item in itemDict] + [print(f"")]
-        # return itemDict
-
     def printQueue(self, title, keyword, itemQueue):
         print(f"============ {title} ============")
         list = [print(f"{keyword}: {item}") for item in itemQueue.queue] + [print(f"")]
 
     def getLinks():
-        return self.links
+        result: queue.Query()
+        result = self.links
+        return result
 
     def getNames():
-        return self.names
+        result: queue.Query()
+        result = self.names
+        return result
+        # return self.names
 
     def getIds():
         return self.ids
-
-    # def setLinks(LinksList): 
-        # populateQueue(LinksList)
-
-    # def setIds(IdsList):
-        # populateQueue(IdsList)
-
-    # def setNames(NamesList):
-        # populateQueue(NamesList)
-
-
-
-
-
 
 # BeautifulSoup
 def createSoup(fileName):
@@ -191,8 +173,12 @@ def getProductHTML(soup, metadata, directory = "./html/products", index = 1, off
     # minis_savedList = [f"{directory}/page-{index}/{name}".replace(" ", "-") for name in mini_names]
     # minis_savedList = [f"{directory}/{name}".replace(" ", "-") for name in names.queue]
     # names = metadata.getNames.queue()
-    names = queue.Queue(metadata.getNames).queue
-    links = queue.Queue(metadata.getLinks).queue
+    # names = queue.Queue(metadata.getNames).queue
+    # links = queue.Queue(metadata.getLinks).queue
+    # names = (metadata.getNames).queue()
+    # links = (metadata.getLinks).queue()
+    names = metadata.names.queue
+    links = metadata.links.queue
     # minis_savedList = [f"{directory}/{name}".replace(" ", "-") for name in names.queue]
     minis_savedList = [f"{directory}/{name}".replace(" ", "-") for name in names]
     list = [mini_saved.put(mini_savedData) for mini_savedData in minis_savedList]
