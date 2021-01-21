@@ -32,10 +32,13 @@ def downloadAllMiniMetadata():
     pageIndexes = [f"{directory}/pages-{index}" for index in range(1, pagesEnd)]
     print(f"============ Tag Extraction ============")
     index = 1
-    # for page in pageIndexes:
-    print(f"Iteration: {index}")
-    # getProductHTML(soup, setupMetadata(), page, dry_run=False)
-    getProductHTML(soup, setupMetadata(), pageIndexes[0], dry_run=False)
+    for page in pageIndexes:
+        # Make new Soup
+        # Create new Metadata
+        # Get product html
+        print(f"Iteration: {index}")
+        # getProductHTML(soup, setupMetadata(), page, dry_run=False)
+        getProductHTML(soup, setupMetadata(), pageIndexes[0], dry_run=False)
     # index += 1
 
     print(f"")
