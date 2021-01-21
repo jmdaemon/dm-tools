@@ -44,7 +44,7 @@ def downloadAllMiniMetadata():
     # populateQueue(linksList, namesList, idsList, metadata)
     getProductHTML(soup, metadata, dry_run=False)
 
-downloadHTMLIndices()
+# downloadHTMLIndices()
 # downloadAllMinis()
 # createMasterIndex()
-# downloadAllMiniMetadata()
+downloadAllMiniMetadata()

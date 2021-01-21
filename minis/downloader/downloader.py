@@ -55,12 +55,15 @@ def listToQueue(itemList):
     list = [itemQueue.put(item) for item in itemList]
     return itemQueue
 
-def getAllHTML(soup, directory = "./html", index = 1, offset = 0, dry_run = False):
+def dirExists(directory):
     if(os.path.exists(directory)):
-        print(f"Directory {directory} already exists.")
+        print(f"{directory} already exists.")
         return
     elif (not os.path.exists(directory)):
         os.makedirs(directory)
+
+def getAllHTML(soup, directory = "./html", index = 1, offset = 0, dry_run = False):
+    if (dirExists(directory)): return
     end = getEnd(getPages(soup))
     pagesList = [f'{site}?s={offset}' for offset in ([*range(offset, end, 48)] + [end])]
     pages = listToQueue(pagesList)
@@ -113,13 +116,8 @@ def getMiniMetadata():
 def printMetadata(LinksQueue, SavedQueue):
     printProductMetadata(SavedQueue, LinksQueue)
 
-
 def getProductHTML(soup, metadata, directory = "./html/products", index = 1, offset = 0, dry_run = False):
-    if(os.path.exists(directory)):
-        print(f"Directory {directory} already exists.")
-        return
-    elif (not os.path.exists(directory)):
-        os.makedirs(directory)
+    dirExists(directory)
     SavedQueue = listToQueue([f"{directory}/{name}".replace(" ", "-") for name in metadata.names.queue])
     print(f"============ Mini Metadata ============")
     if (not dry_run): 
