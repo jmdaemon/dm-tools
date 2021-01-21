@@ -15,7 +15,7 @@ def extractMiniatureLinks(site, soup):
     exp = r"\"?(https://www.shapeways.com/product/\w{9}/)(\w*-*)*(\?optionId=\d{1,16})(.*user-profile)\"?"
     URLS = soup.find_all('a', href = re.compile(exp))
     linkList = list(map(lambda url: url['href'], URLS))
-    return linkList
+    return dict.fromkeys(linkList, 1)
 
 def extractMiniatureNames(site, soup):
     exp = r"\"?(https://www.shapeways.com/product/\w{9}/)(\w*-*)*(\?optionId=\d{1,16})(.*user-profile)\"?"

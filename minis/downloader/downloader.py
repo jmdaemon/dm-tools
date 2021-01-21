@@ -25,58 +25,51 @@ mini_saved = queue.Queue()
 downloadLinks = queue.Queue()
 
 class Metadata():
+    def __init__(self, links, names, ids):
+        self.links = queue.Queue()
+        self.names = queue.Queue()
+        self.ids   = queue.Queue()
 
-    # def populate(self, links, names, ids):
+        self.populate(links, names, ids)
+        # list = [print(f"link: {link}") for link in self.links.queue]
+        # list = [print(f"names: {name}") for name in self.names.queue]
+        self.printQueue("Links", "link", self.links)
+
     def populate(self, links, names, ids):
         list = [self.links.put(link) for link in links]
         list = [self.names.put(name) for name in names]
         list = [self.ids.put(mini_id) for mini_id in ids]
 
-    def printLinks():
-        list = [print(f"link: {link}") for link in self.links]
+    def listToDict(itemList):
+        return dict.fromkeys(itemList, 1)
 
-    # def __init__(links, names, ids):
-    def __init__(self, links, names, ids):
-        # self.links: queue.Queue() = Metadata.populateQueue(self.links, links)
-        # self.names: queue.Queue() = Metadata.populateQueue(self.names, names)
-        # self.ids  : queue.Queue() = Metadata.populateQueue(self.ids, ids)
-        self.links = queue.Queue()
-        self.names = queue.Queue()
-        self.ids   = queue.Queue()
-        # list = [print(f"link: {link}") for link in links]
-        # list = [self.links.put(link) for link in links]
-        # list = [self.names.put(name) for name in names]
-        # list = [self.ids.put(mini_id) for mini_id in ids]
-        self.populate(links, names, ids)
-        list = [print(f"link: {link}") for link in self.links.queue]
-        # self.printLinks
-        # self.printLinks
+    # def createDict(title, keyword, itemList):
+        # itemDict = dict.fromkeys(itemList, 1)
+        # print(f"============ {title} ============")
+        # list = [print(f"{keyword}: {item}") for item in itemDict] + [print(f"")]
+        # return itemDict
 
+    def printQueue(self, title, keyword, itemQueue):
+        print(f"============ {title} ============")
+        list = [print(f"{keyword}: {item}") for item in itemQueue.queue] + [print(f"")]
 
-
-
-        # list = [itemQueue.put(item) for item in itemList]
     def getLinks():
         return self.links
 
     def getNames():
-        # return Queue((self.names))
         return self.names
 
     def getIds():
         return self.ids
 
-    # def populateQueue(itemQueue, itemList): 
-        # list = [itemQueue.put(item) for item in itemList]
+    # def setLinks(LinksList): 
+        # populateQueue(LinksList)
 
-    def setLinks(LinksList): 
-        populateQueue(LinksList)
+    # def setIds(IdsList):
+        # populateQueue(IdsList)
 
-    def setIds(IdsList):
-        populateQueue(IdsList)
-
-    def setNames(NamesList):
-        populateQueue(NamesList)
+    # def setNames(NamesList):
+        # populateQueue(NamesList)
 
 
 
@@ -152,22 +145,22 @@ def getEnd(tag):
     index = regexp.search(tag[5]['href'])
     return int(index.group(0))
 
-def createDict(title, keyword, itemList):
-    itemDict = dict.fromkeys(itemList, 1)
-    print(f"============ {title} ============")
-    list = [print(f"{keyword}: {item}") for item in itemDict] + [print(f"")]
-    return itemDict
+# def createDict(title, keyword, itemList):
+    # itemDict = dict.fromkeys(itemList, 1)
+    # print(f"============ {title} ============")
+    # list = [print(f"{keyword}: {item}") for item in itemDict] + [print(f"")]
+    # return itemDict
 
-def pushOntoQueue(title, keyword, itemList, itemQueue):
-    list = [itemQueue.put(item) for item in createDict(title, keyword, itemList)]
+# def pushOntoQueue(title, keyword, itemList, itemQueue):
+    # list = [itemQueue.put(item) for item in createDict(title, keyword, itemList)]
 
-def populateQueue(linksList, namesList, idsList, metadata):
-    # pushOntoQueue("Links", "link", linksList, links)
-    # pushOntoQueue("Names", "name", namesList, names)
-    # createDict("Ids", "id", idsList)
-    pushOntoQueue("Links", "link", linksList, metadata.links)
-    pushOntoQueue("Names", "name", namesList, metadata.names)
-    pushOntoQueue("Ids", "id", idsList, metadata.ids)
+# def populateQueue(linksList, namesList, idsList, metadata):
+    # # pushOntoQueue("Links", "link", linksList, links)
+    # # pushOntoQueue("Names", "name", namesList, names)
+    # # createDict("Ids", "id", idsList)
+    # pushOntoQueue("Links", "link", linksList, metadata.links)
+    # pushOntoQueue("Names", "name", namesList, metadata.names)
+    # pushOntoQueue("Ids", "id", idsList, metadata.ids)
 
 def saveMini():
     # mini = requests.get(downloadLinks.get(), allow_redirects=True, headers=createHeaders(), auth=(loadCredentials()))
