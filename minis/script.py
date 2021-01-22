@@ -76,9 +76,34 @@ def downloadAllMiniatureTags(directory = "./html/products"):
 
         currentIndex += 1
         pageIndex += 1
+def downloadAllMiniatureImgs(directory = "./html/products"):
+    end, pagesEnd = getEnd()
+    pages = [f"{directory}/pages-{index}" for index in indicesToRange(pagesEnd)]
+    currentIndex = 1
+    pageIndex = 0
+    while (currentIndex <= pagesEnd and pageIndex < pagesEnd):
+        print("Page Index       : {currentIndex}")
+        currentPageDir = pages[pageIndex]
+        print(f"Page Directory  : {currentPageDir}")
+        print(os.listdir(f"{currentPageDir}")) 
+        print(f"")
+        pages = os.listdir(f"{currentPageDir}")
+
+        print("============ Imgs ============")
+        for page in pages:
+            print(f"Miniature Page: {page}")
+            soup = createSoup(f"{currentPageDir}/{page}")
+            imgs = extractMiniatureImgs(soup)
+            for img in imgs:
+                print(f"Img: {img}") 
+            print(f"")
+
+        currentIndex += 1
+        pageIndex += 1
 
 # downloadHTMLIndices()
 # downloadAllMinis()
 # createMasterIndex()
 # downloadAllMiniMetadata()
-downloadAllMiniatureTags()
+# downloadAllMiniatureTags()
+downloadAllMiniatureImgs()

@@ -29,3 +29,8 @@ def extractMiniatureTags(soup):
     tags = soup.find_all('a', class_="product-keyword sw-dms--bg-grey-96")
     result = [tag.text for tag in tags]
     return result
+
+def extractMiniatureImgs(soup):
+    imgs = soup.find_all('img', class_="slideshow-big-img film-strip-img")
+    result = [img['src'] for img in imgs]
+    return result
