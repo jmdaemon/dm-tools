@@ -81,8 +81,8 @@ def downloadMiniature(metadata, directory = "miniatures"):
     print(f"")
 
 def downloadMetadata(LinksQueue, SavedQueue):
-    # writeToFile(requests.get(LinksQueue.get()).text, SavedQueue.get())
-    printProductMetadata(SavedQueue, LinksQueue)
+    writeToFile(requests.get(LinksQueue.get()).text, SavedQueue.get())
+    # printProductMetadata(SavedQueue, LinksQueue)
 
 def replace_all(text, dic):
     for i, j in dic.items():
