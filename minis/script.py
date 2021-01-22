@@ -31,6 +31,29 @@ def getEnd(offset = 0):
 def indicesToRange(pagesEnd): 
     return ([*range(1, pagesEnd)] + [pagesEnd])
 
+def run(directory, title, keyword, target, currentIndex = 1, pageIndex = 0):
+    end, pagesEnd = getEnd()
+    pages = [f"{directory}/pages-{index}" for index in indicesToRange(pagesEnd)]
+    while (currentIndex <= pagesEnd and pageIndex < pagesEnd):
+        print("Page Index       : {currentIndex}")
+        currentPageDir = pages[pageIndex]
+        print(f"Page Directory  : {currentPageDir}")
+        print(os.listdir(f"{currentPageDir}")) 
+        pages = os.listdir(f"{currentPageDir}")
+        print(f"")
+
+        print(f"============ {title} ============")
+        for page in pages:
+            print(f"Miniature Page: {page}")
+            soup = createSoup(f"{currentPageDir}/{page}")
+            tags = target(soup)
+            for tag in tags:
+                print(f"{keyword}: {tag}") 
+            print(f"")
+        print(f"")
+        currentIndex += 1
+        pageIndex += 1
+
 def downloadAllMiniMetadata(base = "./html"):
     print(f"============ Tag Extraction ============")
     end, pagesEnd = getEnd()
@@ -52,54 +75,56 @@ def downloadAllMiniMetadata(base = "./html"):
     print("")
 
 def downloadAllMiniatureTags(directory = "./html/products"):
-    index = 1
-    end, pagesEnd = getEnd()
-    pages = [f"{directory}/pages-{index}" for index in indicesToRange(pagesEnd)]
-    currentIndex = 1
-    pageIndex = 0
-    while (currentIndex <= pagesEnd and pageIndex < pagesEnd):
-        print("Page Index       : {currentIndex}")
-        currentPageDir = pages[pageIndex]
-        print(f"Page Directory  : {currentPageDir}")
-        print(os.listdir(f"{currentPageDir}")) 
-        print(f"")
-        pages = os.listdir(f"{currentPageDir}")
+    run(directory, "Tags", "Tag", extractMiniatureTags)
+    # index = 1
+    # end, pagesEnd = getEnd()
+    # pages = [f"{directory}/pages-{index}" for index in indicesToRange(pagesEnd)]
+    # currentIndex = 1
+    # pageIndex = 0
+    # while (currentIndex <= pagesEnd and pageIndex < pagesEnd):
+        # print("Page Index       : {currentIndex}")
+        # currentPageDir = pages[pageIndex]
+        # print(f"Page Directory  : {currentPageDir}")
+        # print(os.listdir(f"{currentPageDir}")) 
+        # print(f"")
+        # pages = os.listdir(f"{currentPageDir}")
 
-        for page in pages:
-            print("============ Tags ============")
-            print(f"Miniature Page: {page}")
-            soup = createSoup(f"{currentPageDir}/{page}")
-            tags = extractMiniatureTags(soup)
-            for tag in tags:
-                print(f"Tag: {tag}") 
-            print(f"")
+        # for page in pages:
+            # print("============ Tags ============")
+            # print(f"Miniature Page: {page}")
+            # soup = createSoup(f"{currentPageDir}/{page}")
+            # tags = extractMiniatureTags(soup)
+            # for tag in tags:
+                # print(f"Tag: {tag}") 
+            # print(f"")
 
-        currentIndex += 1
-        pageIndex += 1
+        # currentIndex += 1
+        # pageIndex += 1
 def downloadAllMiniatureImgs(directory = "./html/products"):
-    end, pagesEnd = getEnd()
-    pages = [f"{directory}/pages-{index}" for index in indicesToRange(pagesEnd)]
-    currentIndex = 1
-    pageIndex = 0
-    while (currentIndex <= pagesEnd and pageIndex < pagesEnd):
-        print("Page Index       : {currentIndex}")
-        currentPageDir = pages[pageIndex]
-        print(f"Page Directory  : {currentPageDir}")
-        print(os.listdir(f"{currentPageDir}")) 
-        print(f"")
-        pages = os.listdir(f"{currentPageDir}")
+    run(directory, "Imgs", "Img", extractMiniatureImgs)
+    # end, pagesEnd = getEnd()
+    # pages = [f"{directory}/pages-{index}" for index in indicesToRange(pagesEnd)]
+    # currentIndex = 1
+    # pageIndex = 0
+    # while (currentIndex <= pagesEnd and pageIndex < pagesEnd):
+        # print("Page Index       : {currentIndex}")
+        # currentPageDir = pages[pageIndex]
+        # print(f"Page Directory  : {currentPageDir}")
+        # print(os.listdir(f"{currentPageDir}")) 
+        # print(f"")
+        # pages = os.listdir(f"{currentPageDir}")
 
-        print("============ Imgs ============")
-        for page in pages:
-            print(f"Miniature Page: {page}")
-            soup = createSoup(f"{currentPageDir}/{page}")
-            imgs = extractMiniatureImgs(soup)
-            for img in imgs:
-                print(f"Img: {img}") 
-            print(f"")
+        # print("============ Imgs ============")
+        # for page in pages:
+            # print(f"Miniature Page: {page}")
+            # soup = createSoup(f"{currentPageDir}/{page}")
+            # imgs = extractMiniatureImgs(soup)
+            # for img in imgs:
+                # print(f"Img: {img}") 
+            # print(f"")
 
-        currentIndex += 1
-        pageIndex += 1
+        # currentIndex += 1
+        # pageIndex += 1
 
 # downloadHTMLIndices()
 # downloadAllMinis()
