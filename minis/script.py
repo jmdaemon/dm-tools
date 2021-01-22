@@ -76,55 +76,9 @@ def downloadAllMiniMetadata(base = "./html"):
 
 def downloadAllMiniatureTags(directory = "./html/products"):
     run(directory, "Tags", "Tag", extractMiniatureTags)
-    # index = 1
-    # end, pagesEnd = getEnd()
-    # pages = [f"{directory}/pages-{index}" for index in indicesToRange(pagesEnd)]
-    # currentIndex = 1
-    # pageIndex = 0
-    # while (currentIndex <= pagesEnd and pageIndex < pagesEnd):
-        # print("Page Index       : {currentIndex}")
-        # currentPageDir = pages[pageIndex]
-        # print(f"Page Directory  : {currentPageDir}")
-        # print(os.listdir(f"{currentPageDir}")) 
-        # print(f"")
-        # pages = os.listdir(f"{currentPageDir}")
 
-        # for page in pages:
-            # print("============ Tags ============")
-            # print(f"Miniature Page: {page}")
-            # soup = createSoup(f"{currentPageDir}/{page}")
-            # tags = extractMiniatureTags(soup)
-            # for tag in tags:
-                # print(f"Tag: {tag}") 
-            # print(f"")
-
-        # currentIndex += 1
-        # pageIndex += 1
 def downloadAllMiniatureImgs(directory = "./html/products"):
     run(directory, "Imgs", "Img", extractMiniatureImgs)
-    # end, pagesEnd = getEnd()
-    # pages = [f"{directory}/pages-{index}" for index in indicesToRange(pagesEnd)]
-    # currentIndex = 1
-    # pageIndex = 0
-    # while (currentIndex <= pagesEnd and pageIndex < pagesEnd):
-        # print("Page Index       : {currentIndex}")
-        # currentPageDir = pages[pageIndex]
-        # print(f"Page Directory  : {currentPageDir}")
-        # print(os.listdir(f"{currentPageDir}")) 
-        # print(f"")
-        # pages = os.listdir(f"{currentPageDir}")
-
-        # print("============ Imgs ============")
-        # for page in pages:
-            # print(f"Miniature Page: {page}")
-            # soup = createSoup(f"{currentPageDir}/{page}")
-            # imgs = extractMiniatureImgs(soup)
-            # for img in imgs:
-                # print(f"Img: {img}") 
-            # print(f"")
-
-        # currentIndex += 1
-        # pageIndex += 1
 
 # downloadHTMLIndices()
 # downloadAllMinis()
