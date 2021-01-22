@@ -47,18 +47,7 @@ def downloadAllMiniMetadata():
         getProductHTML(soup, metadata, pageIndexes[pageIndex], dry_run=False)
         currentIndex += 1
         pageIndex += 1
-
-    # pagesEnd = end
-    # soup = createSoup(f"{base}/mz4250-creations-page-{pagesEnd}")
-    # metadata = setupMetadata(soup)
-
-    # print(f"Iteration: {pagesEnd}")
-    # getProductHTML(soup, metadata, pageIndexes[pagesEnd - 1], dry_run=False)
-    # currentIndex += 1
-    # pageIndex += 1
-
-
-    print(f"")
+    print("")
 
 # downloadHTMLIndices()
 # downloadAllMinis()
