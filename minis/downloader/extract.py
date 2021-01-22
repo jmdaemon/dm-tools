@@ -27,4 +27,5 @@ def extractMiniatureProductIds(soup, linkList):
 
 def extractMiniatureTags(soup):
     tags = soup.find_all('a', class_="product-keyword sw-dms--bg-grey-96")
-    return tags
+    result = [tag.text for tag in tags]
+    return result
