@@ -24,3 +24,7 @@ def extractMiniatureProductIds(soup, linkList):
     regex = re.compile(exp)
     idsList = [regex.search(link).group(0) for link in linkList]
     return idsList
+
+def extractMiniatureTags(soup):
+    tags = soup.find_all('a', class_="product-keyword sw-dms--bg-grey-96")
+    return tags

@@ -90,7 +90,8 @@ def replace_all(text, dic):
     return text
 
 def escapeSpecialChars(directory, name):
-    specialCharacters = {" ": "-", "/": "-"}
+    specialCharacters = {" ": "-", "/": "ith-"}
+    # specialCharacters = {" ": "-", "/": "-"} # Replace all with -
     # specialCharactersNoDashes = {" ": "", "/": "ith"}
     result = f"{directory}/{replace_all(name, specialCharacters)}"
     return result
@@ -101,3 +102,4 @@ def getProductHTML(soup, metadata, directory = "./html/products", index = 1, off
     if (not dry_run): 
         while (not metadata.links.empty() and not SavedQueue.empty()):
             download(downloadMetadata, args=(metadata.links, SavedQueue)) 
+

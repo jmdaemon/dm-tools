@@ -52,4 +52,4 @@ def downloadAllMiniMetadata():
 # downloadHTMLIndices()
 # downloadAllMinis()
 # createMasterIndex()
-downloadAllMiniMetadata()
+# downloadAllMiniMetadata()
